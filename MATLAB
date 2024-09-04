@@ -1,0 +1,16 @@
+file_list = {'sub24_0_CSD.set', 'sub25_0_CSD.set'};
+input_path = '/Users/derrick/Documents/MATLAB';
+output_path = '/Users/derrick/Documents/MATLAB/eeglab2024.2';
+file_list = {'sub23_0_CSD.set', 'sub24_0_CSD.set', 'sub25_0_CSD.set'};
+file_list = {'sub24_0_CSD.set', 'sub25_0_CSD.set'};
+for i = 1:length(file_list)
+    EEG = pop_loadset('filename', file_list{i}, 'filepath', input_path);
+    data = EEG.data;
+    times = EEG.times;
+    chanlocs = {EEG.chanlocs.labels};
+    srate = EEG.srate;
+    events = EEG.event; 
+    [~, name, ~] = fileparts(file_list{i});
+    output_filename = fullfile(output_path, [name '.mat']);
+    save(output_filename, 'data', 'times', 'chanlocs', 'srate', 'events');
+end
