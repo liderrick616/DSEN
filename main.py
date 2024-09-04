@@ -2,7 +2,50 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import mne
 from torch.utils.data import Dataset, DataLoader
+from scipy.io import loadmat
+import os
+mat_files_path = '/Users/derrick/PycharmProjects/DSEN'
+mat_files = ['sub24_0_CSD.mat', 'sub25_0_CSD.mat']
+datasets = {}
+
+for mat_file in mat_files:
+    data_path = os.path.join(mat_files_path, mat_file)
+    mat_data = loadmat(data_path)
+    dataset_name = os.path.splitext(mat_file)[0]
+    datasets[dataset_name] = {
+        'data': mat_data['data'],
+        'times': mat_data['times'],
+        'chanlocs': mat_data['chanlocs'],
+        'srate': mat_data['srate'],
+        'events': mat_data.get('events', None)  # Use .get() to handle optional event data
+    }
+for dataset_name, dataset in datasets.items():
+    print(f"Dataset: {dataset_name}")
+    data_shape = dataset['data'].shape
+    print(f"  data (shape: {data_shape}):")
+    if len(data_shape) == 2:
+        print(dataset['data'][:, :10])  # Print first 10 time points for all channels
+    elif len(data_shape) == 3:
+        print(dataset['data'][:, :10, 0])  # Print first 10 time points of the first trial for all channels
+    else:
+        print("Unexpected data shape.")
+    # Print time points
+    print(f"  times (shape: {dataset['times'].shape}):")
+    print(dataset['times'][:10])  # Print the first 10 time points
+    # Print channel locations (names)
+    print(f"  chanlocs (number of channels: {len(dataset['chanlocs'])}):")
+    print(dataset['chanlocs'])  # Print all channel names
+    # Print sampling rate
+    print(f"  srate: {dataset['srate']}")
+    if dataset['events'] is not None:
+        print(f"  events:")
+        for event in dataset['events']:
+            print(event)  # Print each event
+    else:
+        print("  events: None")
+    print("\n")
 
 
 class CNN1Dlocal(nn.Module):
