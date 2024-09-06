@@ -57,8 +57,11 @@ class EdgeConvBlock(nn.Module):
         x_expanded = x.unsqueeze(2).expand(-1, -1, num_channels, -1)
         x_neighbors = x.unsqueeze(1).expand(-1, num_channels, -1, -1)
         x_concat = torch.cat([x_expanded, x_neighbors], dim=3)
-
         x_concat = x_concat.view(batch_size * num_channels * num_steps, -1)
+
+        if x_concat.dim() == 3: #modified
+            x_concat = x_concat.transpose(1, 2).contiguous()
+        x_concat = x_concat.view(-1, num_channels * 2)
 
         out = self.linear1(x_concat)
         out = self.relu(out)
@@ -179,6 +182,8 @@ class DSENFeatureExtractor(nn.Module):
 
         # Concatenate pooled outputs
         h_concat = torch.cat((h1_pool, h2_pool, h3_pool), dim=1)
+
+        h_concat = h_concat.view(h_concat.size(0), -1) #modified
 
         # Final fully connected layers
         h_fc1 = self.fc1(h_concat)
@@ -467,4 +472,4 @@ model = DSEN()
 optimizer = optim.Adam(model.parameters(), lr=0.0001)
 
 # Train the model
-train_DSEN(data_loader, model, optimizer)
+train_DSEN(data_loader, model, optimizer, epochs=100)
