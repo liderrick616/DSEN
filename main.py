@@ -73,64 +73,6 @@ class EdgeConvBlock(nn.Module):
         return out
 
 
-"""
-class DSENFeatureExtractor(nn.Module):
-    def __init__(self):
-        super(DSENFeatureExtractor, self).__init__()
-        self.cnn_local = CNN1Dlocal()
-        self.cnn_global = CNN1Dglobal()
-        self.edge_conv1 = EdgeConvBlock(2*128, 128)
-        self.edge_conv2 = EdgeConvBlock(128, 256)
-        self.edge_conv3 = EdgeConvBlock(256, 512)
-        self.global_maxpool = nn.AdaptiveMaxPool1d(1)
-        self.fc1 = nn.Linear(128 + 256 + 512, 256)
-        self.fc2 = nn.Linear(256, 128)
-
-    def forward(self, x):
-        # Local feature extraction
-        local_features = []
-        for i in range(9):
-            segment = x[:, :, i * 400:(i + 1) * 400]
-            print(f"Segment shape: {segment.shape}")  # Debugging
-            local_feat = self.cnn_local(segment)
-            print(f"Local feature shape: {local_feat.shape}")  # Debugging
-            local_features.append(local_feat)
-        x_local = torch.cat(local_features, dim=2)  # Concatenate along the time dimension
-        if x_local.size(2) < 128:
-            # Pad to make the time dimension match 128
-            padding = 128 - x_local.size(2)
-            x_local = F.pad(x_local, (0, padding), "constant", 0)
-        print(f"x_local shape after concatenation: {x_local.shape}")  # Debugging
-
-        # Global feature extraction
-        x_global = self.cnn_global(x)
-        print(f"x_global shape: {x_global.shape}")  # Debugging
-
-        # Concatenate local and global features
-        x_concat = torch.cat((x_local, x_global), dim=1)  # Concatenate along the channel dimension
-        print(f"x_concat shape: {x_concat.shape}")  # Debugging
-
-        # EdgeConv blocks
-        h1 = self.edge_conv1(x_concat)
-        h1_pool = self.global_maxpool(h1).squeeze(-1)
-
-        h2 = self.edge_conv2(h1)
-        h2_pool = self.global_maxpool(h2).squeeze(-1)
-
-        h3 = self.edge_conv3(h2)
-        h3_pool = self.global_maxpool(h3).squeeze(-1)
-
-        # Concatenate pooled outputs
-        h_concat = torch.cat((h1_pool, h2_pool, h3_pool), dim=1)
-
-        # Final fully connected layers
-        h_fc1 = self.fc1(h_concat)
-        h_final = self.fc2(h_fc1)
-
-        return h_final
-"""
-
-
 class DSENFeatureExtractor(nn.Module):
     def __init__(self):
         super(DSENFeatureExtractor, self).__init__()
