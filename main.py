@@ -6,7 +6,27 @@ import numpy as np
 from scipy.signal import hilbert
 from scipy.io import loadmat
 from torch.utils.data import Dataset, DataLoader
+from torch.nn import Sequential, Linear, ReLU, BatchNorm1d, Dropout
+from torch_geometric.nn import EdgeConv, global_max_pool
+from sklearn.metrics import f1_score
 import os
+
+
+class GateFusion(nn.Module):
+    def __init__(self, in_channels=128, out_channels=128):
+        super(GateFusion, self).__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.gate = nn.Sequential(
+            nn.Linear(in_channels, out_channels),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x1, x2):
+        f = x1 * x2
+        gate = self.gate(x1)
+        out = gate * f
+        return out
 
 
 class CNN1Dlocal(nn.Module):
@@ -78,11 +98,6 @@ class DSENFeatureExtractor(nn.Module):
         super(DSENFeatureExtractor, self).__init__()
         self.cnn_local = CNN1Dlocal()
         self.cnn_global = CNN1Dglobal()
-
-        # Second convolution to reduce concatenated local features to (30, 128)
-        self.second_conv = nn.Conv1d(in_channels=30, out_channels=30, kernel_size=3, padding=1)
-        self.pool_to_128 = nn.AdaptiveAvgPool1d(128)
-
         self.edge_conv1 = EdgeConvBlock(2*128, 128)
         self.edge_conv2 = EdgeConvBlock(128, 256)
         self.edge_conv3 = EdgeConvBlock(256, 512)
@@ -95,22 +110,24 @@ class DSENFeatureExtractor(nn.Module):
         local_features = []
         for i in range(9):
             segment = x[:, :, i * 400:(i + 1) * 400]
+            print(f"Segment shape: {segment.shape}")  # Debugging
             local_feat = self.cnn_local(segment)
+            print(f"Local feature shape: {local_feat.shape}")  # Debugging
             local_features.append(local_feat)
-        x_local = torch.cat(local_features, dim=2)  # Concatenate 9 segments, shape is [batch_size, 30, 900]
-
-        # Apply second 1D convolution to reduce to (30, 128)
-        x_local = self.second_conv(x_local)
-        x_local = self.pool_to_128(x_local)  # Now shape is [batch_size, 30, 128]
-        print(f"x_local shape after reduction: {x_local.shape}")
+        x_local = torch.cat(local_features, dim=2)  # Concatenate along the time dimension
+        if x_local.size(2) < 128:
+            # Pad to make the time dimension match 128
+            padding = 128 - x_local.size(2)
+            x_local = F.pad(x_local, (0, padding), "constant", 0)
+        print(f"x_local shape after concatenation: {x_local.shape}")  # Debugging
 
         # Global feature extraction
-        x_global = self.cnn_global(x)  # x_global is already [batch_size, 30, 128]
-        print(f"x_global shape: {x_global.shape}")
+        x_global = self.cnn_global(x)
+        print(f"x_global shape: {x_global.shape}")  # Debugging
 
         # Concatenate local and global features
-        x_concat = torch.cat((x_local, x_global), dim=1)  # Now shapes match for concatenation
-        print(f"x_concat shape: {x_concat.shape}")
+        x_concat = torch.cat((x_local, x_global), dim=1)  # Concatenate along the channel dimension
+        print(f"x_concat shape: {x_concat.shape}")  # Debugging
 
         # EdgeConv blocks
         h1 = self.edge_conv1(x_concat)
@@ -124,8 +141,6 @@ class DSENFeatureExtractor(nn.Module):
 
         # Concatenate pooled outputs
         h_concat = torch.cat((h1_pool, h2_pool, h3_pool), dim=1)
-
-        h_concat = h_concat.view(h_concat.size(0), -1) #modified
 
         # Final fully connected layers
         h_fc1 = self.fc1(h_concat)
@@ -165,42 +180,103 @@ class AttentionFusionClassifier(nn.Module):
         return out
 
 
-"""
 class DSEN(nn.Module):
-    def __init__(self):
+    def __init__(self, num_features=128, time_len=3600, num_channels=30, num_segments=9):
         super(DSEN, self).__init__()
-        self.feature_extractor = DSENFeatureExtractor()
-        self.classifier = AttentionFusionClassifier()
+        self.num_features = num_features
+        self.time_len = time_len
+        self.num_channels = num_channels
+        self.num_segments = num_segments
 
-    def forward(self, X, Y, Z=None):
-        H_X = self.feature_extractor(X)
-        H_Y = self.feature_extractor(Y)
-        preds = self.classifier(H_X, H_Y)
+        self.block_1 = nn.Sequential(
+            nn.Conv1d(
+                in_channels=30,
+                out_channels=30,
+                kernel_size=32,
+                groups=30,
+                bias=False,
+                padding=(32 - 1) // 2
+            ),
+            nn.BatchNorm1d(30),
+            nn.ELU(),
+            nn.AdaptiveAvgPool1d(100)
+        )
 
-        if Z is not None:
-            H_Z = self.feature_extractor(Z)
-            return preds, H_X, H_Y, H_Z
-        else:
-            return preds, H_X, H_Y
-"""
+        self.block_2 = nn.Sequential(
+            nn.Conv1d(
+                in_channels=30,
+                out_channels=30,
+                kernel_size=100,
+                bias=False,
+                groups=30,
+            ),
+            nn.BatchNorm1d(30),
+            nn.ELU(),
+            nn.AdaptiveAvgPool1d(128)
+        )
+
+        self.conv1 = EdgeConv(Sequential(Linear(2 * 128, 128), ReLU(), Linear(128, 128), ReLU(), BatchNorm1d(128), Dropout(p=0.2)))
+        self.conv2 = EdgeConv(Sequential(Linear(2 * 128, 256), ReLU(), Linear(256, 256), ReLU(), BatchNorm1d(256), Dropout(p=0.2)))
+        self.conv3 = EdgeConv(Sequential(Linear(2 * 256, 512), ReLU(), Linear(512, 512), ReLU(), BatchNorm1d(512), Dropout(p=0.2)))
+
+        self.linear1 = Linear(128 + 256 + 512, 256)
+        self.linear2 = Linear(256, 128)
+
+    def forward(self, x, edge_index, batch):
+        x = x.view(-1, self.num_channels, self.time_len)
+
+        # Process each of the 9 segments (from 3600 time points, split into 9)
+        segments = torch.split(x, 200, dim=2)
+        out_seg_list = []
+        for segment_x in segments:
+            out_seg_list.append(self.block_1(segment_x))
+
+        # Concatenate and apply global block
+        x = torch.cat(out_seg_list, dim=2)
+        x = self.block_2(x)
+        x = F.dropout(x, p=0.25)
+
+        # Apply EdgeConv
+        x1 = self.conv1(x, edge_index)
+        x1_pooled = global_max_pool(x1, batch)
+        x2 = self.conv2(x1, edge_index)
+        x2_pooled = global_max_pool(x2, batch)
+        x3 = self.conv3(x2, edge_index)
+        x3_pooled = global_max_pool(x3, batch)
+
+        # Fully connected layers
+        out = torch.cat([x1_pooled, x2_pooled, x3_pooled], dim=1)
+        out = F.relu(self.linear1(out))
+        out = F.relu(self.linear2(out))
+        return out
 
 
-class DSEN(nn.Module):
-    def __init__(self):
-        super(DSEN, self).__init__()
-        self.feature_extractor = DSENFeatureExtractor()  # Extract features for X and Y
-        self.classifier = AttentionFusionClassifier()  # Classify relationship
+class RelationClassifier(nn.Module):
+    def __init__(self, encoder, num_channels=30, num_classes=2, num_features=448):
+        super(RelationClassifier, self).__init__()
+        self.encoder = encoder
+        self.num_features = num_features
+        self.num_channels = num_channels
+        self.input_size = 256
+        self.hidden_size = self.input_size // 2
+        self.fc1 = nn.Linear(self.input_size, self.hidden_size)
+        self.fc2 = nn.Linear(self.hidden_size, num_classes)
+        self.relation_conv = EdgeConv(Sequential(Linear(2 * self.num_features, self.input_size), ReLU()))
 
-    def forward(self, X, Y):
-        # Extract features for both friend subjects X and Y
-        H_X = self.feature_extractor(X)
-        H_Y = self.feature_extractor(Y)
-
-        # Classify based on fused features from X and Y
-        preds = self.classifier(H_X, H_Y)
-
-        # No need for H_Z (stranger) for now
-        return preds, H_X, H_Y
+    def forward(self, x1, x2, edge_index=None, batch=None, c2c_index=None):
+        x1 = self.encoder(x1)
+        x2 = self.encoder(x2)
+        x1 = x1.view(-1, self.num_channels, self.num_features)
+        x2 = x2.view(-1, self.num_channels, self.num_features)
+        x = torch.cat((x1, x2), dim=1)
+        x = x.view(-1, self.num_features)
+        x = self.relation_conv(x, c2c_index)
+        new_batch = torch.repeat_interleave(batch, 2)
+        x = global_max_pool(x, new_batch)
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        return F.softmax(x, dim=1)
 
 
 def cosine_similarity(x1, x2):
@@ -208,28 +284,25 @@ def cosine_similarity(x1, x2):
 
 
 class EEGDataset(Dataset):
-    def __init__(self, mat_files, mat_files_path, n_emotions=9):
+    def __init__(self, friend_files, stranger_files, mat_files_path, n_emotions=9):
         self.data_X = []
         self.data_Y = []
+        self.data_Z = []  # For triplet loss (stranger data)
         self.labels = []
         self.n_emotions = n_emotions
 
-        # Load the friend data pair (sub81_0_CSD.mat and sub82_0_CSD.mat)
-        for mat_file in mat_files:
+        # Load friend data
+        for mat_file in friend_files:
             data_path = os.path.join(mat_files_path, mat_file)
             mat_data = loadmat(data_path)
-
             data = mat_data['data']  # Shape should be (30, time_steps)
-
-            # Split data into X and Y (for the two friends)
             mid_point = data.shape[1] // 2
-            data_X = data[:, :mid_point]  # First half for subject X
-            data_Y = data[:, mid_point:]  # Second half for subject Y
+            data_X = data[:, :mid_point]
+            data_Y = data[:, mid_point:]
 
             # Compute instantaneous amplitude using Hilbert transform
             analytic_signal_X = hilbert(data_X)
             analytic_signal_Y = hilbert(data_Y)
-
             amplitude_X = np.abs(analytic_signal_X)
             amplitude_Y = np.abs(analytic_signal_Y)
 
@@ -241,94 +314,33 @@ class EEGDataset(Dataset):
                 self.data_X.append(torch.FloatTensor(amplitude_X[:, start:end]))
                 self.data_Y.append(torch.FloatTensor(amplitude_Y[:, start:end]))
 
-            # Assuming you know the labels beforehand for training (e.g., 1 for friends)
-            label = 1  # Since 81 and 82 are friends
-            self.labels.extend([label] * self.n_emotions)
+            # Add friend label (assuming 1 means friends)
+            self.labels.extend([1] * self.n_emotions)
 
-    def __len__(self):
-        return len(self.data_X)
-
-    def __getitem__(self, idx):
-        X = self.data_X[idx]
-        Y = self.data_Y[idx]
-        label = torch.LongTensor([self.labels[idx]])
-        return X, Y, label
-
-
-"""
-class EEGDataset(Dataset):
-    def __init__(self, mat_files, mat_files_path, n_emotions=9):
-        self.data_X = []
-        self.data_Y = []
-        self.data_Z = []  # Z represents the stranger data
-        self.labels = []
-        self.n_emotions = n_emotions
-
-        # Load the friend data pair (sub81_0_CSD.mat and sub82_0_CSD.mat)
-        all_data = []
-        for mat_file in mat_files:
+        # Load stranger data (negative samples)
+        self.data_Z = []
+        for mat_file in stranger_files:
             data_path = os.path.join(mat_files_path, mat_file)
             mat_data = loadmat(data_path)
-
             data = mat_data['data']  # Shape should be (30, time_steps)
-            all_data.append(data)
+            amplitude_Z = np.abs(hilbert(data))
 
-        # Assuming first two files are friends data (81, 82)
-        data_X = all_data[0]  # sub81_0_CSD.mat
-        data_Y = all_data[1]  # sub82_0_CSD.mat
-
-        # Compute instantaneous amplitude using Hilbert transform for X and Y
-        analytic_signal_X = hilbert(data_X)
-        analytic_signal_Y = hilbert(data_Y)
-        amplitude_X = np.abs(analytic_signal_X)
-        amplitude_Y = np.abs(analytic_signal_Y)
-
-        # Segment the data into n_emotions segments for X and Y
-        segment_length = amplitude_X.shape[1] // self.n_emotions
-        for i in range(self.n_emotions):
-            start = i * segment_length
-            end = (i + 1) * segment_length
-            self.data_X.append(torch.FloatTensor(amplitude_X[:, start:end]))
-            self.data_Y.append(torch.FloatTensor(amplitude_Y[:, start:end]))
-
-        # Assign friendship labels
-        label = 1  # Since 81 and 82 are friends
-        self.labels.extend([label] * self.n_emotions)
-
-        # Create Z data (stranger) randomly from the data not in (X, Y)
-        self.data_Z = self.create_Z_data(all_data)
-
-    def create_Z_data(self, all_data):
-        data_Z = []
-        for i in range(len(self.data_X)):
-            # Randomly select a sample from the data (stranger) not from X or Y
-            while True:
-                idx = np.random.randint(2, len(all_data))  # Assuming the first two are friends
-                data_Z_full = all_data[idx]
-                analytic_signal_Z = hilbert(data_Z_full)
-                amplitude_Z = np.abs(analytic_signal_Z)
-
-                # Segment the Z data in the same way as X and Y
-                segment_length = amplitude_Z.shape[1] // self.n_emotions
-                start = (i % self.n_emotions) * segment_length
-                end = ((i % self.n_emotions) + 1) * segment_length
-
-                if data_Z_full.shape == self.data_X[i].shape:
-                    data_Z.append(torch.FloatTensor(amplitude_Z[:, start:end]))
-                    break  # Ensure Z is selected and properly segmented
-        return data_Z
+            # Segment the data into n_emotions segments for the stranger
+            segment_length = amplitude_Z.shape[1] // self.n_emotions
+            for i in range(self.n_emotions):
+                start = i * segment_length
+                end = (i + 1) * segment_length
+                self.data_Z.append(torch.FloatTensor(amplitude_Z[:, start:end]))
 
     def __len__(self):
         return len(self.data_X)
 
     def __getitem__(self, idx):
-        X = self.data_X[idx]
-        Y = self.data_Y[idx]
-        Z = self.data_Z[idx]  # Fetch the stranger data (Z)
-        label = torch.LongTensor([self.labels[idx]])
+        X = self.data_X[idx]  # Anchor
+        Y = self.data_Y[idx]  # Positive (Friend)
+        Z = self.data_Z[idx % len(self.data_Z)]  # Negative (Stranger, randomly selected)
+        label = torch.LongTensor([self.labels[idx]])  # Label for anchor-positive pair (e.g., 1 for friends)
         return X, Y, Z, label
-
-"""
 
 
 def triplet_loss(anchor, positive, negative, margin=0.2):
@@ -358,54 +370,73 @@ def cca_loss(H_X, H_Y):
 
 
 # Combined loss function
-def combined_loss(preds, labels, H_X, H_Y, alpha=1, beta=1, gamma=1):
+def combined_loss(preds, labels, H_X, H_Y,H_Z=None, alpha=1, beta=1, gamma=1):
     classification_loss = F.cross_entropy(preds, labels)
     cca_loss_val = cca_loss(H_X, H_Y)
-    #triplet_loss_val = triplet_loss(H_X, H_Y, H_Z)
-    return alpha * classification_loss + beta * cca_loss_val #+ gamma * triplet_loss_val
+    if H_Z is not None:
+        triplet_loss_val = triplet_loss(H_X, H_Y, H_Z)
+    else:
+        triplet_loss_val = 0  # No triplet loss if H_Z is not provided
+    return alpha * classification_loss + beta * cca_loss_val + gamma * triplet_loss_val
 
 
-"""
 def train_DSEN(data_loader, model, optimizer, epochs=100):
     model.train()
+
     for epoch in range(epochs):
+        total_loss = 0
+        total_classification_loss = 0
+        total_cca_loss = 0
+        total_triplet_loss = 0
+        all_preds = []
+        all_labels = []
+
         for X, Y, Z, labels in data_loader:
             optimizer.zero_grad()
 
-            # Forward pass for X, Y, and Z
+            # Forward pass
             preds, H_X, H_Y, H_Z = model(X, Y, Z)
 
-            # Compute triplet loss
-            triplet_loss_val = triplet_loss(H_X, H_Y, H_Z)
-
-            # Compute classification loss
+            # Compute the combined loss
             classification_loss = F.cross_entropy(preds, labels)
+            cca_loss_val = cca_loss(H_X, H_Y)
+            triplet_loss_val = triplet_loss(H_X, H_Y, H_Z)
+            loss = classification_loss + cca_loss_val + triplet_loss_val
 
-            # Combine losses (weights alpha, beta can be adjusted)
-            loss = classification_loss + triplet_loss_val
+            # Backward pass and optimization
             loss.backward()
             optimizer.step()
 
-        print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss.item()}")
-"""
+            # Aggregate losses for the epoch
+            total_loss += loss.item()
+            total_classification_loss += classification_loss.item()
+            total_cca_loss += cca_loss_val.item()
+            total_triplet_loss += triplet_loss_val.item()
 
+            # Convert predicted probabilities to class labels
+            predicted_labels = torch.argmax(preds, dim=1)
+            all_preds.extend(predicted_labels.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
 
-# Training function
-def train_DSEN(data_loader, model, optimizer, epochs=100):
-    model.train()
-    for epoch in range(epochs):
-        for X, Y, labels in data_loader:
-            optimizer.zero_grad()
-            preds, H_X, H_Y = model(X, Y)  # No H_Z
-            loss = combined_loss(preds, labels, H_X, H_Y)  # Updated loss function
-            loss.backward()
-            optimizer.step()
-        print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss.item()}")
+        # Compute the average losses for the epoch
+        avg_loss = total_loss / len(data_loader)
+        avg_classification_loss = total_classification_loss / len(data_loader)
+        avg_cca_loss = total_cca_loss / len(data_loader)
+        avg_triplet_loss = total_triplet_loss / len(data_loader)
+
+        # Calculate F1-score for the epoch
+        f1 = f1_score(all_labels, all_preds, average='weighted')  # 'weighted' accounts for label imbalance
+
+        # Log the results for this epoch
+        print(f"Epoch {epoch + 1}/{epochs}, Total Loss: {avg_loss:.3f}, "
+              f"Classification Loss: {avg_classification_loss:.3f}, "
+              f"CCA Loss: {avg_cca_loss:.3f}, Triplet Loss: {avg_triplet_loss:.3f}, "
+              f"F1-Score: {f1:.3f}")
 
 
 # Initialize dataset and DataLoader
 mat_files_path = '/Users/derrick/PycharmProjects/DSEN'
-mat_files = ['sub81_0_CSD.mat', 'sub82_0_CSD.mat']
+mat_files = ['sub81_0_CSD.mat', 'sub82_0_CSD.mat', 'sub34_0_CSD.mat']
 dataset = EEGDataset(mat_files, mat_files_path)
 data_loader = DataLoader(dataset, batch_size=79, shuffle=True)
 
