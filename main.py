@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from scipy.io import loadmat
 import torch
 import torch.nn as nn
@@ -8,17 +9,12 @@ from torch_geometric.nn import EdgeConv, global_max_pool
 from itertools import combinations
 from torch.utils.data import Dataset, DataLoader
 from sklearn.metrics import f1_score
-import mne
-import os
-
-
-
+import random
 # Helper function to create a fully connected edge index
 def create_fully_connected_edge_index(num_nodes):
     edge_index = torch.tensor(list(combinations(range(num_nodes), 2)), dtype=torch.long)
     edge_index = torch.cat([edge_index, edge_index.flip(1)], dim=0).t()
     return edge_index
-
 
 # Triplet Loss Implementation
 class TripletLoss(nn.Module):
@@ -38,7 +34,6 @@ class TripletLoss(nn.Module):
             raise ValueError(f"Unsupported dist_func: {self.dist_func}")
         losses = F.relu(distance_positive - distance_negative + self.margin)
         return losses.mean()
-
 
 # CCA Loss Implementation
 class CCALoss(nn.Module):
@@ -63,7 +58,6 @@ class CCALoss(nn.Module):
         corr = torch.trace(torch.mm(T, S12.t()))
         loss = -corr  # We want to maximize correlation, so minimize negative correlation
         return loss
-
 
 # DSEN Model Implementation
 class DSEN(nn.Module):
@@ -174,7 +168,6 @@ class DSEN(nn.Module):
 
         return out  # Shape: (batch_size, 128)
 
-
 # Relation Classifier with Attention Mechanism
 class RelationClassifier(nn.Module):
     def __init__(self, num_features=128, num_classes=2):
@@ -221,12 +214,11 @@ class RelationClassifier(nn.Module):
 
         return x  # Logits
 
-
 # Putting it all together
 class DSENModel(nn.Module):
-    def __init__(self):
+    def __init__(self, num_channels=30, time_len=3600):
         super(DSENModel, self).__init__()
-        self.encoder = DSEN()
+        self.encoder = DSEN(num_channels=num_channels, time_len=time_len)
         self.classifier = RelationClassifier()
 
     def forward(self, x1, x2):
@@ -239,36 +231,42 @@ class DSENModel(nn.Module):
 
         return logits, h_x1, h_x2
 
-
-# Load your data
-def load_eeg_data_mne(data_dir, file_names):
+# Load your data from .mat files
+def load_eeg_data_mat(data_dir, file_names):
     data = []
     labels = []
     for file_name in file_names:
-        # Construct the full path to the .set file
-        set_file = os.path.join(data_dir, file_name)
-        
-        # Load the EEG data using MNE
-        raw = mne.io.read_raw_eeglab(set_file, preload=True)
-        
-        # Get the data as a NumPy array
-        eeg_data, times = raw.get_data(return_times=True)  # Shape: (num_channels, n_times)
-        
+        mat_file = os.path.join(data_dir, file_name)
+        mat = loadmat(mat_file)
+        keys = mat.keys()
+        print(f"Keys in {file_name}: {mat.keys()}")  # For debugging
+
+        # Replace 'EEGData' with the actual key in your .mat files
+        # Assuming the EEG data is stored under the key 'EEGData' in shape (num_channels, time_len)
+        eeg_data = mat[keys]  # Update this based on your .mat file structure
+
+        # Ensure data is of type float32
+        eeg_data = eeg_data.astype(np.float32)
+
+        # Transpose if necessary to get shape (num_channels, time_len)
+        if eeg_data.shape[0] > eeg_data.shape[1]:
+            eeg_data = eeg_data.T
+
         # Extract subject ID from file name
         subject_id = int(file_name.split('_')[0][3:])
-        
+
         # Assign labels based on subject IDs
         if subject_id in [81, 82]:
             label = 1  # Friends
         else:
             label = 0  # Stranger
-        
+
         data.append(eeg_data)
         labels.append(label)
-        
+
         # Print data shape for verification
         print(f"Loaded {file_name}: EEG data shape = {eeg_data.shape}")
-    
+
     return data, labels
 
 # Create pairs and triplets
@@ -284,31 +282,30 @@ def create_pairs_and_triplets(data, labels):
                 pair_labels.append(1)  # Friends
             else:
                 pair_labels.append(0)  # Strangers
-    
+
     # Create triplets for triplet loss
     triplets = []
     for i in range(num_subjects):
         anchor = data[i]
         label = labels[i]
-        
+
         # Find positive samples (same label)
         positive_indices = [idx for idx, l in enumerate(labels) if l == label and idx != i]
         if not positive_indices:
             continue  # Skip if no positive sample
-        
+
         positive = data[random.choice(positive_indices)]
-        
+
         # Find negative samples (different label)
         negative_indices = [idx for idx, l in enumerate(labels) if l != label]
         if not negative_indices:
             continue  # Skip if no negative sample
-        
-        negative = data[random.choice(negative_indices)]
-        
-        triplets.append((anchor, positive, negative))
-    
-    return pairs, pair_labels, triplets
 
+        negative = data[random.choice(negative_indices)]
+
+        triplets.append((anchor, positive, negative))
+
+    return pairs, pair_labels, triplets
 
 # Custom Dataset
 class EEGDataset(Dataset):
@@ -316,36 +313,35 @@ class EEGDataset(Dataset):
         self.pairs = pairs
         self.pair_labels = pair_labels
         self.triplets = triplets
-    
+
     def __len__(self):
         return len(self.pairs)
-    
+
     def __getitem__(self, idx):
         x1, x2 = self.pairs[idx]
         label = self.pair_labels[idx]
-        
+
         # For triplet loss, pick a random triplet
         triplet_idx = random.randint(0, len(self.triplets) - 1)
         anchor, positive, negative = self.triplets[triplet_idx]
-        
+
         # Convert data to torch tensors and flatten
-        x1 = torch.from_numpy(x1).float()  # Shape: (num_channels, n_times)
+        x1 = torch.from_numpy(x1).float()  # Shape: (num_channels, time_len)
         x2 = torch.from_numpy(x2).float()
         anchor = torch.from_numpy(anchor).float()
         positive = torch.from_numpy(positive).float()
         negative = torch.from_numpy(negative).float()
-        
-        # Ensure the data is reshaped appropriately
+
+        # Flatten the data
         x1 = x1.view(-1)
         x2 = x2.view(-1)
         anchor = anchor.view(-1)
         positive = positive.view(-1)
         negative = negative.view(-1)
-        
-        label = torch.tensor(label).long()
-        
-        return x1, x2, anchor, positive, negative, label
 
+        label = torch.tensor(label).long()
+
+        return x1, x2, anchor, positive, negative, label
 
 # Training function
 def train_model(model, train_loader, optimizer, criterion_classification, criterion_triplet, criterion_cca, device):
@@ -393,48 +389,43 @@ def train_model(model, train_loader, optimizer, criterion_classification, criter
     f1 = f1_score(all_labels, all_preds, average='weighted')
     return avg_loss, f1
 
-
 # Main training loop
 if __name__ == '__main__':
-    import random
-    
     # Device configuration
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    
-    # Load data using MNE-Python
+
+    # Load data from .mat files
     data_dir = '/Users/derrick/PycharmProjects/DSEN'
-    file_names = ['sub81_0_CSD.set', 'sub82_0_CSD.set', 'sub24_0_CSD.set']
-    data, labels = load_eeg_data_mne(data_dir, file_names)
-    
+    file_names = ['sub81_0_CSD.mat', 'sub82_0_CSD.mat', 'sub24_0_CSD.mat']
+    data, labels = load_eeg_data_mat(data_dir, file_names)
+
     # Check data shapes
     for i, eeg_data in enumerate(data):
         print(f"Subject {file_names[i]}: EEG data shape = {eeg_data.shape}")
-    
+
     # Create pairs and triplets
     pairs, pair_labels, triplets = create_pairs_and_triplets(data, labels)
-    
+
     # Create dataset and dataloader
     dataset = EEGDataset(pairs, pair_labels, triplets)
-    batch_size = 1  # Adjust based on your data size
+    batch_size = 79  # Adjust based on your data size
     train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    
+
     # Initialize the model with correct parameters
     num_channels, time_len = data[0].shape
     model = DSENModel(num_channels=num_channels, time_len=time_len).to(device)
-    
+
     # Define loss functions and optimizer
     criterion_classification = nn.CrossEntropyLoss()
     criterion_triplet = TripletLoss(margin=1.0)
     criterion_cca = CCALoss()
     learning_rate = 1e-4
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    num_epochs = 10  # Adjust as needed
-    
+    num_epochs = 100  # Adjust as needed
+
     # Training loop
     for epoch in range(num_epochs):
         avg_loss, f1 = train_model(model, train_loader, optimizer, criterion_classification, criterion_triplet, criterion_cca, device)
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}, F1 Score: {f1:.4f}')
-    
+
     print('Training complete.')
-
-
