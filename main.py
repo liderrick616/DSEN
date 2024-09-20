@@ -1,6 +1,7 @@
 import numpy as np
 import os
 from scipy.io import loadmat
+#from collections import Counter
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,6 +11,7 @@ from itertools import combinations
 from torch.utils.data import Dataset, DataLoader
 from sklearn.metrics import f1_score
 import random
+
 # Helper function to create a fully connected edge index
 def create_fully_connected_edge_index(num_nodes):
     edge_index = torch.tensor(list(combinations(range(num_nodes), 2)), dtype=torch.long)
@@ -71,67 +73,67 @@ class DSEN(nn.Module):
         # Temporal Feature Extraction
         self.block_1 = nn.Sequential(
             nn.Conv1d(
-                in_channels=1,
-                out_channels=1,
+                in_channels=self.num_channels,  # Changed from 1 to self.num_channels
+                out_channels=self.num_channels,  # You can adjust out_channels as needed
                 kernel_size=64,
                 groups=1,
                 bias=False,
                 padding=32
             ),
-            nn.BatchNorm1d(1),
+            nn.BatchNorm1d(self.num_channels),
             nn.ELU(),
             nn.AdaptiveAvgPool1d(100)
         )
 
         self.block_2 = nn.Sequential(
             nn.Conv1d(
-                in_channels=1,
-                out_channels=1,
+                in_channels=self.num_channels,  # Changed from 1 to self.num_channels
+                out_channels=self.num_channels,  # Adjust out_channels as needed
                 kernel_size=200,
                 groups=1,
                 bias=False,
+                padding=100
             ),
-            nn.BatchNorm1d(1),
+            nn.BatchNorm1d(self.num_channels),
             nn.ELU(),
             nn.AdaptiveAvgPool1d(128)
         )
 
+        # Rest of the model remains the same...
+
+
         # Spatial Feature Extraction (DGCNN)
-        self.conv1 = EdgeConv(Sequential(Linear(2 * 128, 128), ReLU(), Linear(128, 128), ReLU(), BatchNorm1d(128), Dropout(p=0.2)))
-        self.conv2 = EdgeConv(Sequential(Linear(2 * 128, 256), ReLU(), Linear(256, 256), ReLU(), BatchNorm1d(256), Dropout(p=0.2)))
-        self.conv3 = EdgeConv(Sequential(Linear(2 * 256, 512), ReLU(), Linear(512, 512), ReLU(), BatchNorm1d(512), Dropout(p=0.2)))
+        self.conv1 = EdgeConv(Sequential(Linear(2 * 128, 128), ReLU(), Linear(128, 128), ReLU(), BatchNorm1d(128), Dropout(p=0.25)))
+        self.conv2 = EdgeConv(Sequential(Linear(2 * 128, 256), ReLU(), Linear(256, 256), ReLU(), BatchNorm1d(256), Dropout(p=0.25)))
+        self.conv3 = EdgeConv(Sequential(Linear(2 * 256, 512), ReLU(), Linear(512, 512), ReLU(), BatchNorm1d(512), Dropout(p=0.25)))
 
         self.linear1 = Linear(128 + 256 + 512, 256)
         self.linear2 = Linear(256, 128)
 
     def forward(self, x):
         batch_size = x.size(0)
-        x = x.view(batch_size, self.num_channels, self.time_len)  # Shape: (batch_size, num_channels, time_len)
+        x = x.view(batch_size, self.num_channels, self.time_len)
+        #print(f"Input shape after reshape: {x.shape}")  # Should be (batch_size, 30, 3600)
+        segment_len = self.time_len // self.num_segments  # Should be 400
+        #print(f"Segment length: {segment_len}")
+        segments = torch.split(x, segment_len, dim=2)
+        #print(f"Number of segments: {len(segments)}")  # Should be 9
 
-        # Split into segments along time dimension
-        segment_len = self.time_len // self.num_segments
-        segments = torch.split(x, segment_len, dim=2)  # Each with shape (batch_size, num_channels, segment_len)
-
-        # Process each segment
         segment_features = []
-        for segment in segments:
-            # Process each channel separately
-            channel_features = []
-            for ch in range(self.num_channels):
-                ch_data = segment[:, ch, :].unsqueeze(1)  # Shape: (batch_size, 1, segment_len)
-                out = self.block_1(ch_data)
-                out = self.block_2(out)
-                out = out.squeeze(1)  # Shape: (batch_size, feature_len)
-                channel_features.append(out)
-            # Stack features from all channels
-            channel_features = torch.stack(channel_features, dim=1)  # Shape: (batch_size, num_channels, feature_len)
-            segment_features.append(channel_features)
+        for idx, segment in enumerate(segments):
+            #print(f"Segment {idx} shape before block_1: {segment.shape}")  # (batch_size, 30, 400)
+            out = self.block_1(segment)
+            #print(f"Segment {idx} shape after block_1: {out.shape}")  # (batch_size, 30, 100)
+            segment_features.append(out)
 
-        # Concatenate features from all segments along time dimension
-        x = torch.cat(segment_features, dim=2)  # Shape: (batch_size, num_channels, total_feature_len)
+        x = torch.cat(segment_features, dim=2)
+        #print(f"Shape after concatenation: {x.shape}")  # (batch_size, 30, 900)
 
-        # Flatten batch and channel dimensions
-        x = x.view(batch_size * self.num_channels, -1)
+        x = self.block_2(x)
+        #print(f"Shape after block_2: {x.shape}")  # (batch_size, 30, 128)
+
+        # Flatten batch and channel dimensions for graph processing
+        x = x.view(batch_size * self.num_channels, -1)  # Shape: (batch_size * num_channels, 128)
 
         # Create edge_index for a single graph
         edge_index = create_fully_connected_edge_index(self.num_channels)  # Shape: [2, num_edges]
@@ -167,6 +169,7 @@ class DSEN(nn.Module):
         out = F.relu(self.linear2(out))
 
         return out  # Shape: (batch_size, 128)
+
 
 # Relation Classifier with Attention Mechanism
 class RelationClassifier(nn.Module):
@@ -235,22 +238,26 @@ class DSENModel(nn.Module):
 def load_eeg_data_mat(data_dir, file_names):
     data = []
     labels = []
+    min_length = None  # Keep track of the minimum length
+
     for file_name in file_names:
         mat_file = os.path.join(data_dir, file_name)
         mat = loadmat(mat_file)
         keys = mat.keys()
         print(f"Keys in {file_name}: {mat.keys()}")  # For debugging
-
-        # Replace 'EEGData' with the actual key in your .mat files
-        # Assuming the EEG data is stored under the key 'EEGData' in shape (num_channels, time_len)
-        eeg_data = mat[keys]  # Update this based on your .mat file structure
+        # Access the EEG data
+        eeg_data = mat['data']  # Use the appropriate key for your EEG data
 
         # Ensure data is of type float32
         eeg_data = eeg_data.astype(np.float32)
 
-        # Transpose if necessary to get shape (num_channels, time_len)
+        # Transpose if necessary
         if eeg_data.shape[0] > eeg_data.shape[1]:
             eeg_data = eeg_data.T
+
+        # Update minimum length
+        if min_length is None or eeg_data.shape[1] < min_length:
+            min_length = eeg_data.shape[1]
 
         # Extract subject ID from file name
         subject_id = int(file_name.split('_')[0][3:])
@@ -265,9 +272,13 @@ def load_eeg_data_mat(data_dir, file_names):
         labels.append(label)
 
         # Print data shape for verification
-        print(f"Loaded {file_name}: EEG data shape = {eeg_data.shape}")
+        #print(f"Loaded {file_name}: EEG data shape = {eeg_data.shape}")
+    # Truncate all data to the minimum length
+    for i in range(len(data)):
+        data[i] = data[i][:, :min_length]  # Truncate to min_length
 
     return data, labels
+
 
 # Create pairs and triplets
 def create_pairs_and_triplets(data, labels):
@@ -307,6 +318,7 @@ def create_pairs_and_triplets(data, labels):
 
     return pairs, pair_labels, triplets
 
+
 # Custom Dataset
 class EEGDataset(Dataset):
     def __init__(self, pairs, pair_labels, triplets):
@@ -319,8 +331,11 @@ class EEGDataset(Dataset):
 
     def __getitem__(self, idx):
         x1, x2 = self.pairs[idx]
+        #print(f"x1 shape: {x1.shape}")
+        #print(f"x2 shape: {x2.shape}")
         label = self.pair_labels[idx]
-
+        #print(f"x1 shape: {x1.shape}")
+        #print(f"x2 shape: {x2.shape}")
         # For triplet loss, pick a random triplet
         triplet_idx = random.randint(0, len(self.triplets) - 1)
         anchor, positive, negative = self.triplets[triplet_idx]
@@ -332,16 +347,10 @@ class EEGDataset(Dataset):
         positive = torch.from_numpy(positive).float()
         negative = torch.from_numpy(negative).float()
 
-        # Flatten the data
-        x1 = x1.view(-1)
-        x2 = x2.view(-1)
-        anchor = anchor.view(-1)
-        positive = positive.view(-1)
-        negative = negative.view(-1)
-
         label = torch.tensor(label).long()
 
         return x1, x2, anchor, positive, negative, label
+
 
 # Training function
 def train_model(model, train_loader, optimizer, criterion_classification, criterion_triplet, criterion_cca, device):
@@ -367,9 +376,14 @@ def train_model(model, train_loader, optimizer, criterion_classification, criter
         loss_classification = criterion_classification(logits, label)
         loss_triplet = criterion_triplet(h_anchor, h_positive, h_negative)
         loss_cca = criterion_cca(h_anchor, h_positive)
+        alpha = 1.0  # Weight for classification loss
+        beta = 1.0  # Weight for triplet loss
+        gamma = 1.0  # Weight for CCA loss
+
+        loss = alpha * loss_classification + beta * loss_triplet + gamma * loss_cca
 
         # Combined loss
-        loss = loss_classification + loss_triplet + loss_cca
+        #loss = loss_classification + loss_triplet + loss_cca
 
         # Backward and optimize
         optimizer.zero_grad()
@@ -388,12 +402,73 @@ def train_model(model, train_loader, optimizer, criterion_classification, criter
     # Compute F1 score
     f1 = f1_score(all_labels, all_preds, average='weighted')
     return avg_loss, f1
+"""
+def train_model(model, train_loader, optimizer, criterion_classification, criterion_triplet, criterion_cca, device):
+    model.train()
+    total_loss = 0
+    all_labels = []
+    all_preds = []
+    for batch in train_loader:
+        # Unpack the batch
+        x1, x2, anchor, positive, negative, label = batch
+        x1 = x1.to(device)
+        x2 = x2.to(device)
+        anchor = anchor.to(device)
+        positive = positive.to(device)
+        negative = negative.to(device)
+        label = label.to(device)
 
+        # Forward pass through the feature extractor
+        h_anchor = model.encoder(anchor)
+        h_positive = model.encoder(positive)
+        h_negative = model.encoder(negative)
+
+        # Compute triplet loss and update feature extractor parameters
+        loss_triplet = criterion_triplet(h_anchor, h_positive, h_negative)
+        optimizer.zero_grad()
+        loss_triplet.backward()
+        optimizer.step()
+
+        # Forward pass for classification and CCA loss
+        h_x1 = model.encoder(x1)
+        h_x2 = model.encoder(x2)
+
+        # Compute CCA loss
+        loss_cca = criterion_cca(h_x1, h_x2)
+
+        # Attention fusion and classification
+        logits = model.classifier(h_x1, h_x2)
+
+        # Compute classification loss
+        loss_classification = criterion_classification(logits, label)
+
+        # Compute combined loss
+        alpha = 1.0
+        beta = 1.0
+        loss_combined = alpha * loss_classification + beta * loss_cca
+
+        # Backward and optimize
+        optimizer.zero_grad()
+        loss_combined.backward()
+        optimizer.step()
+
+        total_loss += loss_combined.item()
+
+        # Collect predictions and labels for F1 score
+        preds = torch.argmax(logits, dim=1).cpu().numpy()
+        labels = label.cpu().numpy()
+        all_preds.extend(preds)
+        all_labels.extend(labels)
+
+    avg_loss = total_loss / len(train_loader)
+    # Compute F1 score
+    f1 = f1_score(all_labels, all_preds, average='weighted')
+    return avg_loss, f1
+"""
 # Main training loop
 if __name__ == '__main__':
     # Device configuration
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+    device = torch.device('cpu')
     # Load data from .mat files
     data_dir = '/Users/derrick/PycharmProjects/DSEN'
     file_names = ['sub81_0_CSD.mat', 'sub82_0_CSD.mat', 'sub24_0_CSD.mat']
@@ -411,10 +486,23 @@ if __name__ == '__main__':
     batch_size = 79  # Adjust based on your data size
     train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    # Initialize the model with correct parameters
+    """
+    num_classes = 2
+    labels = pair_labels  # Use the labels from your pairs
+    class_counts = Counter(labels)
+    print(f"Class counts: {class_counts}")
+    total_samples = sum(class_counts.values())
+    class_weights = []
+    for class_index in range(num_classes):
+        class_count = class_counts[class_index]
+        weight = total_samples / (num_classes * class_count)
+        class_weights.append(weight)
+    class_weights = torch.tensor(class_weights, dtype=torch.float32).to(device)
+    print(f"Class weights: {class_weights}")
+    criterion_classification = nn.CrossEntropyLoss(weight=class_weights)
+    """
     num_channels, time_len = data[0].shape
     model = DSENModel(num_channels=num_channels, time_len=time_len).to(device)
-
     # Define loss functions and optimizer
     criterion_classification = nn.CrossEntropyLoss()
     criterion_triplet = TripletLoss(margin=1.0)
