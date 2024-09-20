@@ -263,7 +263,7 @@ def load_eeg_data_mat(data_dir, file_names):
         subject_id = int(file_name.split('_')[0][3:])
 
         # Assign labels based on subject IDs
-        if subject_id in [81, 82]:
+        if subject_id in [81, 82, 80]:
             label = 1  # Friends
         else:
             label = 0  # Stranger
@@ -471,7 +471,12 @@ if __name__ == '__main__':
     device = torch.device('cpu')
     # Load data from .mat files
     data_dir = '/Users/derrick/PycharmProjects/DSEN'
-    file_names = ['sub81_0_CSD.mat', 'sub82_0_CSD.mat', 'sub24_0_CSD.mat']
+
+    friend_files = ['sub80_0_CSD.mat', 'sub81_0_CSD.mat', 'sub82_0_CSD.mat']
+    stranger_files = ['sub23_0_CSDtest(1).mat', 'sub24_0_CSD.mat', 'sub25_0_CSD.mat']
+    file_names = friend_files + stranger_files
+
+    #file_names = ['sub81_0_CSD.mat', 'sub82_0_CSD.mat', 'sub24_0_CSD.mat']
     data, labels = load_eeg_data_mat(data_dir, file_names)
 
     # Check data shapes
