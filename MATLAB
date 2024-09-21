@@ -1,15 +1,52 @@
-file_list = {'sub24_0_CSD.set', 'sub25_0_CSD.set'};
-input_path = '/Users/derrick/Documents/MATLAB';
-output_path = '/Users/derrick/Documents/MATLAB/eeglab2024.2';
-file_list = {'sub24_0_CSD.set', 'sub25_0_CSD.set'};
-for i = 1:length(file_list)
-    EEG = pop_loadset('filename', file_list{i}, 'filepath', input_path);
-    data = EEG.data;
-    times = EEG.times;
-    chanlocs = {EEG.chanlocs.labels};
-    srate = EEG.srate;
-    events = EEG.event; 
-    [~, name, ~] = fileparts(file_list{i});
-    output_filename = fullfile(output_path, [name '.mat']);
-    save(output_filename, 'data', 'times', 'chanlocs', 'srate', 'events');
+% Add EEGLAB to the MATLAB path
+eeglab_path = '/Users/derrick/Documents/MATLAB/eeglab2024.2';
+addpath(eeglab_path);
+
+% Initialize EEGLAB
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+% Define your file list and paths
+file_list = {'sub28_1_CSD.set','sub28_4_CSD.set','sub28_5_CSD.set','sub28_6_CSD.set','sub28_7_CSD.set','sub28_9_CSD.set',};
+input_path = '/Users/derrick/Documents/MATLAB/eeglab2024.2';
+output_path = '/Users/derrick/PycharmProjects/DSEN';
+
+% Verify that output path exists
+if ~exist(output_path, 'dir')
+    mkdir(output_path);
 end
+
+% Loop through each file and process
+for i = 1:length(file_list)
+    % Construct the full file path
+    full_file_path = fullfile(input_path, file_list{i});
+    
+    % Check if the file exists
+    if exist(full_file_path, 'file') ~= 2
+        fprintf('File does not exist: %s\n', full_file_path);
+        continue; % Skip to the next file
+    end
+    
+    try
+        % Load the .set file
+        EEG = pop_loadset('filename', file_list{i}, 'filepath', input_path);
+        [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, 0);
+        
+        % Extract data
+        data = EEG.data;
+        times = EEG.times;
+        chanlocs = {EEG.chanlocs.labels};
+        srate = EEG.srate;
+        events = EEG.event; 
+        
+        % Generate output filename
+        [~, name, ~] = fileparts(file_list{i});
+        output_filename = fullfile(output_path, [name '.mat']);
+        
+        % Save to .mat file
+        save(output_filename, 'data', 'times', 'chanlocs', 'srate', 'events');
+        fprintf('Successfully processed and saved: %s\n', output_filename);
+    catch ME
+        fprintf('Error processing file %s:\n%s\n', full_file_path, ME.message);
+    end
+end
+
