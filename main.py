@@ -473,7 +473,7 @@ if __name__ == '__main__':
     data_dir = '/Users/derrick/PycharmProjects/DSEN'
 
     friend_files = ['sub80_0_CSD.mat', 'sub81_0_CSD.mat', 'sub82_0_CSD.mat']
-    stranger_files = ['sub23_0_CSDtest(1).mat', 'sub24_0_CSD.mat', 'sub25_0_CSD.mat']
+    stranger_files = ['sub23_0_CSDtest(1).mat', 'sub24_0_CSD.mat', 'sub25_0_CSD.mat','sub27_1_CSD.mat','sub27_4_CSD.mat']
     file_names = friend_files + stranger_files
 
     #file_names = ['sub81_0_CSD.mat', 'sub82_0_CSD.mat', 'sub24_0_CSD.mat']
