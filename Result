@@ -196,38 +196,3 @@ Dataset: sub25_0_CSD
   srate: [[1000]]
   events:
 [(array(['boundary'], dtype='<U8'), array([[0.5]]), array([[131000]], dtype=int32))]
-
-
-Input x size: torch.Size([16, 32, 100])
-Concatenated edge_features size: torch.Size([16, 32, 32, 200])
-Flattened edge_features size: torch.Size([16384, 200])
-MLP output size: torch.Size([16384, 128])
-Reshaped edge_features size: torch.Size([16, 32, 32, 128])
-Input x size: torch.Size([16, 32, 128])
-Concatenated edge_features size: torch.Size([16, 32, 32, 256])
-Flattened edge_features size: torch.Size([16384, 256])
-MLP output size: torch.Size([16384, 256])
-Reshaped edge_features size: torch.Size([16, 32, 32, 256])
-Input x size: torch.Size([16, 32, 256])
-Concatenated edge_features size: torch.Size([16, 32, 32, 512])
-Flattened edge_features size: torch.Size([16384, 512])
-MLP output size: torch.Size([16384, 512])
-Reshaped edge_features size: torch.Size([16, 32, 32, 512])
-Traceback (most recent call last):
-  File "/Users/derrick/PycharmProjects/DSEN/main.py", line 286, in <module>
-    train_dsen(dsen_model, optimizer, data_loader)
-  File "/Users/derrick/PycharmProjects/DSEN/main.py", line 234, in train_dsen
-    HX, HY, HZ = dsen_model(AX, adj)
-  File "/Users/derrick/PycharmProjects/DSEN/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/Users/derrick/PycharmProjects/DSEN/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/Users/derrick/PycharmProjects/DSEN/main.py", line 193, in forward
-    HX_projected = self.linear_projector(HX)
-  File "/Users/derrick/PycharmProjects/DSEN/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/Users/derrick/PycharmProjects/DSEN/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/Users/derrick/PycharmProjects/DSEN/venv/lib/python3.9/site-packages/torch/nn/modules/linear.py", line 116, in forward
-    return F.linear(input, self.weight, self.bias)
-RuntimeError: mat1 and mat2 shapes cannot be multiplied (512x896 and 512x128)
