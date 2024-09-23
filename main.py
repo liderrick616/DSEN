@@ -263,7 +263,7 @@ def load_eeg_data_mat(data_dir, file_names):
         subject_id = int(file_name.split('_')[0][3:])
 
         # Assign labels based on subject IDs
-        if subject_id in [81, 82, 80]:
+        if subject_id in [81, 82, 80, 61, 62, 63, 64, 65, 66, 95, 96, 97, 98, 101, 102]:
             label = 1  # Friends
         else:
             label = 0  # Stranger
@@ -473,7 +473,7 @@ if __name__ == '__main__':
     data_dir = '/Users/derrick/PycharmProjects/DSEN'
 
     friend_files = ['sub80_0_CSD.mat', 'sub81_0_CSD.mat', 'sub82_0_CSD.mat']
-    stranger_files = ['sub23_0_CSDtest(1).mat', 'sub24_0_CSD.mat', 'sub25_0_CSD.mat','sub27_1_CSD.mat','sub27_4_CSD.mat']
+    stranger_files = ['sub23_0_CSDtest(1).mat', 'sub24_0_CSD.mat', 'sub25_0_CSD.mat', 'sub27_1_CSD.mat', 'sub27_4_CSD.mat']
     file_names = friend_files + stranger_files
 
     #file_names = ['sub81_0_CSD.mat', 'sub82_0_CSD.mat', 'sub24_0_CSD.mat']
@@ -514,7 +514,8 @@ if __name__ == '__main__':
     criterion_cca = CCALoss()
     learning_rate = 1e-4
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    num_epochs = 100  # Adjust as needed
+    num_epochs = 100
+    # changes become minimal after around 12 epoches.
 
     # Training loop
     for epoch in range(num_epochs):
@@ -522,3 +523,4 @@ if __name__ == '__main__':
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}, F1 Score: {f1:.4f}')
 
     print('Training complete.')
+
