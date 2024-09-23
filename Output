@@ -40,3 +40,34 @@ Epoch [27/100], Loss: -12.4187, F1 Score: 0.7111
 Epoch [28/100], Loss: -12.4763, F1 Score: 0.7111
 ...
 Training complete.
+
+-------------------------------------------------------
+Keys in sub80_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub81_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub82_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub23_0_CSDtest(1).mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub24_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub25_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub27_1_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub27_4_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Subject sub80_0_CSD.mat: EEG data shape = (30, 120001)
+Subject sub81_0_CSD.mat: EEG data shape = (30, 120001)
+Subject sub82_0_CSD.mat: EEG data shape = (30, 120001)
+Subject sub23_0_CSDtest(1).mat: EEG data shape = (30, 120001)
+Subject sub24_0_CSD.mat: EEG data shape = (30, 120001)
+Subject sub25_0_CSD.mat: EEG data shape = (30, 120001)
+Subject sub27_1_CSD.mat: EEG data shape = (30, 120001)
+Subject sub27_4_CSD.mat: EEG data shape = (30, 120001)
+Epoch [1/100], Loss: -25.2239, F1 Score: 0.4184
+Epoch [2/100], Loss: -25.2652, F1 Score: 0.5534
+Epoch [3/100], Loss: -25.3136, F1 Score: 0.7078
+Epoch [4/100], Loss: -25.3002, F1 Score: 0.7219
+Epoch [5/100], Loss: -25.3402, F1 Score: 0.7219
+Epoch [6/100], Loss: -25.3899, F1 Score: 0.8080
+Epoch [7/100], Loss: -25.4001, F1 Score: 0.8242
+Epoch [8/100], Loss: -25.3944, F1 Score: 0.8832
+Epoch [9/100], Loss: -25.4195, F1 Score: 0.8053
+Epoch [10/100], Loss: -25.4425, F1 Score: 0.8242
+Epoch [11/100], Loss: -25.4795, F1 Score: 0.8423
+...
+Training complete.
