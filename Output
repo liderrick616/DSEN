@@ -71,3 +71,66 @@ Epoch [10/100], Loss: -25.4425, F1 Score: 0.8242
 Epoch [11/100], Loss: -25.4795, F1 Score: 0.8423
 ...
 Training complete.
+
+Keys in sub80_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub81_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub82_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub23_0_CSDtest(1).mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub24_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub25_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub27_1_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Keys in sub27_4_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
+Subject sub80_0_CSD.mat: EEG data shape = (30, 120001)
+Subject sub81_0_CSD.mat: EEG data shape = (30, 120001)
+Subject sub82_0_CSD.mat: EEG data shape = (30, 120001)
+Subject sub23_0_CSDtest(1).mat: EEG data shape = (30, 120001)
+Subject sub24_0_CSD.mat: EEG data shape = (30, 120001)
+Subject sub25_0_CSD.mat: EEG data shape = (30, 120001)
+Subject sub27_1_CSD.mat: EEG data shape = (30, 120001)
+Subject sub27_4_CSD.mat: EEG data shape = (30, 120001)
+/Users/derrick/PycharmProjects/DSEN/main.py:58: UserWarning: torch.cholesky is deprecated in favor of torch.linalg.cholesky and will be removed in a future PyTorch release.
+L = torch.cholesky(A)
+should be replaced with
+L = torch.linalg.cholesky(A)
+and
+U = torch.cholesky(A, upper=True)
+should be replaced with
+U = torch.linalg.cholesky(A).mH
+This transform will produce equivalent results for all valid (symmetric positive definite) inputs. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/BatchLinearAlgebra.cpp:1703.)
+  D1 = torch.cholesky(SigmaHat11)
+Loss Classification: 0.6509, Loss CCA: -30.5595, Loss Triplet: 1.0199, Loss Combined: 0.9565
+Epoch [1/50], Combined Loss: 0.9565, Triplet Loss: 1.0199, F1 Score: 0.7653
+Loss Classification: 0.5734, Loss CCA: -29.9671, Loss Triplet: 1.0157, Loss Combined: 0.8731
+Epoch [2/50], Combined Loss: 0.8731, Triplet Loss: 1.0157, F1 Score: 0.8423
+Loss Classification: 0.4818, Loss CCA: -30.3047, Loss Triplet: 0.9988, Loss Combined: 0.7849
+Epoch [3/50], Combined Loss: 0.7849, Triplet Loss: 0.9988, F1 Score: 0.8423
+Loss Classification: 0.4290, Loss CCA: -30.5545, Loss Triplet: 1.0014, Loss Combined: 0.7345
+Epoch [4/50], Combined Loss: 0.7345, Triplet Loss: 1.0014, F1 Score: 0.8423
+Loss Classification: 0.3610, Loss CCA: -30.8399, Loss Triplet: 0.9676, Loss Combined: 0.6694
+Epoch [5/50], Combined Loss: 0.6694, Triplet Loss: 0.9676, F1 Score: 0.8423
+Loss Classification: 0.3615, Loss CCA: -31.4132, Loss Triplet: 0.9993, Loss Combined: 0.6756
+Epoch [6/50], Combined Loss: 0.6756, Triplet Loss: 0.9993, F1 Score: 0.8423
+Loss Classification: 0.3556, Loss CCA: -31.4993, Loss Triplet: 0.9885, Loss Combined: 0.6706
+Epoch [7/50], Combined Loss: 0.6706, Triplet Loss: 0.9885, F1 Score: 0.8423
+Loss Classification: 0.3637, Loss CCA: -32.1273, Loss Triplet: 0.9861, Loss Combined: 0.6849
+Epoch [8/50], Combined Loss: 0.6849, Triplet Loss: 0.9861, F1 Score: 0.8423
+Loss Classification: 0.2617, Loss CCA: -32.8049, Loss Triplet: 0.9701, Loss Combined: 0.5897
+Epoch [9/50], Combined Loss: 0.5897, Triplet Loss: 0.9701, F1 Score: 0.8423
+Loss Classification: 0.3815, Loss CCA: -32.9481, Loss Triplet: 0.9912, Loss Combined: 0.7110
+Epoch [10/50], Combined Loss: 0.7110, Triplet Loss: 0.9912, F1 Score: 0.8423
+Loss Classification: 0.3050, Loss CCA: -33.6185, Loss Triplet: 0.9728, Loss Combined: 0.6412
+Epoch [11/50], Combined Loss: 0.6412, Triplet Loss: 0.9728, F1 Score: 0.8423
+Loss Classification: 0.2826, Loss CCA: -33.1828, Loss Triplet: 0.9665, Loss Combined: 0.6145
+Epoch [12/50], Combined Loss: 0.6145, Triplet Loss: 0.9665, F1 Score: 0.8423
+Loss Classification: 0.2128, Loss CCA: -32.9821, Loss Triplet: 0.9867, Loss Combined: 0.5427
+Epoch [13/50], Combined Loss: 0.5427, Triplet Loss: 0.9867, F1 Score: 0.8423
+Loss Classification: 0.2318, Loss CCA: -32.6331, Loss Triplet: 0.9619, Loss Combined: 0.5581
+Epoch [14/50], Combined Loss: 0.5581, Triplet Loss: 0.9619, F1 Score: 0.8423
+Loss Classification: 0.2359, Loss CCA: -33.6412, Loss Triplet: 0.9498, Loss Combined: 0.5723
+Epoch [15/50], Combined Loss: 0.5723, Triplet Loss: 0.9498, F1 Score: 0.8423
+Loss Classification: 0.2209, Loss CCA: -33.1867, Loss Triplet: 0.9117, Loss Combined: 0.5527
+Epoch [16/50], Combined Loss: 0.5527, Triplet Loss: 0.9117, F1 Score: 0.8423
+Loss Classification: 0.2018, Loss CCA: -33.4125, Loss Triplet: 0.8915, Loss Combined: 0.5359
+Epoch [17/50], Combined Loss: 0.5359, Triplet Loss: 0.8915, F1 Score: 0.8423
+...
+Training complete.
