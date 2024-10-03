@@ -37,29 +37,38 @@ class TripletLoss(nn.Module):
         losses = F.relu(distance_positive - distance_negative + self.margin)
         return losses.mean()
 
-# CCA Loss Implementation
 class CCALoss(nn.Module):
     def __init__(self):
         super(CCALoss, self).__init__()
 
     def forward(self, H1, H2):
-        o1 = H1.size(0)
-        o2 = H2.size(0)
+        r1 = 1e-4
+        r2 = 1e-4
+        eps = 1e-10
 
-        H1 = H1 - H1.mean(dim=0)
-        H2 = H2 - H2.mean(dim=0)
+        H1_centered = H1 - H1.mean(dim=0)
+        H2_centered = H2 - H2.mean(dim=0)
 
-        S12 = torch.mm(H1.t(), H2) / (o1 - 1)
-        S11 = torch.mm(H1.t(), H1) / (o1 - 1) + 1e-4 * torch.eye(H1.size(1)).to(H1.device)
-        S22 = torch.mm(H2.t(), H2) / (o2 - 1) + 1e-4 * torch.eye(H2.size(1)).to(H2.device)
+        SigmaHat12 = H1_centered.t().mm(H2_centered)
+        SigmaHat11 = H1_centered.t().mm(H1_centered) + r1 * torch.eye(H1.size(1)).to(H1.device)
+        SigmaHat22 = H2_centered.t().mm(H2_centered) + r2 * torch.eye(H2.size(1)).to(H2.device)
 
-        S11_inv = torch.inverse(S11)
-        S22_inv = torch.inverse(S22)
+        # Cholesky decomposition
+        try:
+            D1 = torch.cholesky(SigmaHat11)
+            D2 = torch.cholesky(SigmaHat22)
+        except RuntimeError as e:
+            print(f"Cholesky decomposition error: {e}")
+            # Use more stable inverse or pseudo-inverse if necessary
+            D1 = torch.linalg.cholesky(SigmaHat11 + eps * torch.eye(SigmaHat11.size(0)).to(H1.device))
+            D2 = torch.linalg.cholesky(SigmaHat22 + eps * torch.eye(SigmaHat22.size(0)).to(H2.device))
 
-        T = torch.mm(torch.mm(S11_inv, S12), S22_inv)
-        corr = torch.trace(torch.mm(T, S12.t()))
-        loss = -corr  # We want to maximize correlation, so minimize negative correlation
+        T = torch.inverse(D1).mm(SigmaHat12).mm(torch.inverse(D2).t())
+        U, S, V = torch.svd(T)
+        corr = torch.sum(S)
+        loss = -corr
         return loss
+
 
 # DSEN Model Implementation
 class DSEN(nn.Module):
@@ -351,11 +360,10 @@ class EEGDataset(Dataset):
 
         return x1, x2, anchor, positive, negative, label
 
-
-# Training function
-def train_model(model, train_loader, optimizer, criterion_classification, criterion_triplet, criterion_cca, device):
+def train_model(model, train_loader, optimizer_f, optimizer_c, criterion_classification, criterion_triplet, criterion_cca, device):
     model.train()
-    total_loss = 0
+    total_loss_combined = 0
+    total_loss_triplet = 0
     all_labels = []
     all_preds = []
     for batch in train_loader:
@@ -368,91 +376,51 @@ def train_model(model, train_loader, optimizer, criterion_classification, criter
         negative = negative.to(device)
         label = label.to(device)
 
-        # Forward pass
-        logits, h_anchor, h_positive = model(x1, x2)
-        h_negative = model.encoder(negative)
+        ############################
+        # First Optimization Step: Update θ_f using L_triplet
+        ############################
 
-        # Compute losses
-        loss_classification = criterion_classification(logits, label)
-        loss_triplet = criterion_triplet(h_anchor, h_positive, h_negative)
-        loss_cca = criterion_cca(h_anchor, h_positive)
-        alpha = 1.0  # Weight for classification loss
-        beta = 1.0  # Weight for triplet loss
-        gamma = 1.0  # Weight for CCA loss
-
-        loss = alpha * loss_classification + beta * loss_triplet + gamma * loss_cca
-
-        # Combined loss
-        #loss = loss_classification + loss_triplet + loss_cca
-
-        # Backward and optimize
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        total_loss += loss.item()
-
-        # Collect predictions and labels for F1 score
-        preds = torch.argmax(logits, dim=1).cpu().numpy()
-        labels = label.cpu().numpy()
-        all_preds.extend(preds)
-        all_labels.extend(labels)
-
-    avg_loss = total_loss / len(train_loader)
-    # Compute F1 score
-    f1 = f1_score(all_labels, all_preds, average='weighted')
-    return avg_loss, f1
-"""
-def train_model(model, train_loader, optimizer, criterion_classification, criterion_triplet, criterion_cca, device):
-    model.train()
-    total_loss = 0
-    all_labels = []
-    all_preds = []
-    for batch in train_loader:
-        # Unpack the batch
-        x1, x2, anchor, positive, negative, label = batch
-        x1 = x1.to(device)
-        x2 = x2.to(device)
-        anchor = anchor.to(device)
-        positive = positive.to(device)
-        negative = negative.to(device)
-        label = label.to(device)
-
-        # Forward pass through the feature extractor
+        # Forward pass through the feature extractor for triplet loss
         h_anchor = model.encoder(anchor)
         h_positive = model.encoder(positive)
         h_negative = model.encoder(negative)
 
-        # Compute triplet loss and update feature extractor parameters
+        # Compute Triplet Loss
         loss_triplet = criterion_triplet(h_anchor, h_positive, h_negative)
-        optimizer.zero_grad()
+
+        # Backward and optimize θ_f
+        optimizer_f.zero_grad()
         loss_triplet.backward()
-        optimizer.step()
+        optimizer_f.step()
 
-        # Forward pass for classification and CCA loss
-        h_x1 = model.encoder(x1)
-        h_x2 = model.encoder(x2)
+        ############################
+        # Second Optimization Step: Update θ_f and θ_c using L_combined
+        ############################
 
-        # Compute CCA loss
-        loss_cca = criterion_cca(h_x1, h_x2)
+        # Forward pass through the entire model
+        logits, h_x1, h_x2 = model(x1, x2)
 
-        # Attention fusion and classification
-        logits = model.classifier(h_x1, h_x2)
-
-        # Compute classification loss
+        # Compute Classification Loss
         loss_classification = criterion_classification(logits, label)
 
-        # Compute combined loss
-        alpha = 1.0
-        beta = 1.0
-        loss_combined = alpha * loss_classification + beta * loss_cca
+        # Compute CCA Loss
+        loss_cca = criterion_cca(h_x1, h_x2)
 
-        # Backward and optimize
-        optimizer.zero_grad()
+        # Compute Combined Loss
+        alpha = 1.0  # Weight for classification loss
+        beta = 0.01  # Weight for CCA loss
+        loss_combined = alpha * loss_classification - beta * loss_cca  # Subtract if loss_cca is negative
+
+        # Backward and optimize θ_f and θ_c
+        optimizer_f.zero_grad()
+        optimizer_c.zero_grad()
         loss_combined.backward()
-        optimizer.step()
+        optimizer_f.step()
+        optimizer_c.step()
 
-        total_loss += loss_combined.item()
+        # For logging purposes
+        total_loss_combined += loss_combined.item()
+        total_loss_triplet += loss_triplet.item()
 
         # Collect predictions and labels for F1 score
         preds = torch.argmax(logits, dim=1).cpu().numpy()
@@ -460,15 +428,25 @@ def train_model(model, train_loader, optimizer, criterion_classification, criter
         all_preds.extend(preds)
         all_labels.extend(labels)
 
-    avg_loss = total_loss / len(train_loader)
+        # Print individual losses
+        print(f'Loss Classification: {loss_classification.item():.4f}, '
+              f'Loss CCA: {loss_cca.item():.4f}, '
+              f'Loss Triplet: {loss_triplet.item():.4f}, '
+              f'Loss Combined: {loss_combined.item():.4f}')
+
+    avg_loss_combined = total_loss_combined / len(train_loader)
+    avg_loss_triplet = total_loss_triplet / len(train_loader)
     # Compute F1 score
     f1 = f1_score(all_labels, all_preds, average='weighted')
-    return avg_loss, f1
-"""
-# Main training loop
+    return avg_loss_combined, avg_loss_triplet, f1
+
+
+
+
 if __name__ == '__main__':
     # Device configuration
     device = torch.device('cpu')
+
     # Load data from .mat files
     data_dir = '/Users/derrick/PycharmProjects/DSEN'
 
@@ -476,7 +454,7 @@ if __name__ == '__main__':
     stranger_files = ['sub23_0_CSDtest(1).mat', 'sub24_0_CSD.mat', 'sub25_0_CSD.mat', 'sub27_1_CSD.mat', 'sub27_4_CSD.mat']
     file_names = friend_files + stranger_files
 
-    #file_names = ['sub81_0_CSD.mat', 'sub82_0_CSD.mat', 'sub24_0_CSD.mat']
+    # Load EEG data and labels
     data, labels = load_eeg_data_mat(data_dir, file_names)
 
     # Check data shapes
@@ -491,36 +469,39 @@ if __name__ == '__main__':
     batch_size = 79  # Adjust based on your data size
     train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    """
-    num_classes = 2
-    labels = pair_labels  # Use the labels from your pairs
-    class_counts = Counter(labels)
-    print(f"Class counts: {class_counts}")
-    total_samples = sum(class_counts.values())
-    class_weights = []
-    for class_index in range(num_classes):
-        class_count = class_counts[class_index]
-        weight = total_samples / (num_classes * class_count)
-        class_weights.append(weight)
-    class_weights = torch.tensor(class_weights, dtype=torch.float32).to(device)
-    print(f"Class weights: {class_weights}")
-    criterion_classification = nn.CrossEntropyLoss(weight=class_weights)
-    """
+    # Initialize the model
     num_channels, time_len = data[0].shape
     model = DSENModel(num_channels=num_channels, time_len=time_len).to(device)
-    # Define loss functions and optimizer
+
+    # Define loss functions
     criterion_classification = nn.CrossEntropyLoss()
     criterion_triplet = TripletLoss(margin=1.0)
     criterion_cca = CCALoss()
+
+    # Define learning rate
     learning_rate = 1e-4
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    num_epochs = 100
-    # changes become minimal after around 12 epoches.
+
+    # Initialize separate optimizers
+    optimizer_f = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate)
+    optimizer_c = torch.optim.Adam(model.classifier.parameters(), lr=learning_rate)
+
+    num_epochs = 50
 
     # Training loop
     for epoch in range(num_epochs):
-        avg_loss, f1 = train_model(model, train_loader, optimizer, criterion_classification, criterion_triplet, criterion_cca, device)
-        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}, F1 Score: {f1:.4f}')
+        avg_loss_combined, avg_loss_triplet, f1 = train_model(
+            model,
+            train_loader,
+            optimizer_f,
+            optimizer_c,
+            criterion_classification,
+            criterion_triplet,
+            criterion_cca,
+            device
+        )
+        print(f'Epoch [{epoch+1}/{num_epochs}], Combined Loss: {avg_loss_combined:.4f}, '
+              f'Triplet Loss: {avg_loss_triplet:.4f}, F1 Score: {f1:.4f}')
 
     print('Training complete.')
+
 
