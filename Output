@@ -1,136 +1,263 @@
-Keys in sub80_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub81_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub82_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub23_0_CSDtest(1).mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub24_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub25_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Subject sub80_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub81_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub82_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub23_0_CSDtest(1).mat: EEG data shape = (30, 120001)
-Subject sub24_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub25_0_CSD.mat: EEG data shape = (30, 120001)
-Epoch [1/100], Loss: -12.2261, F1 Score: 0.4000
-Epoch [2/100], Loss: -12.2123, F1 Score: 0.2667
-Epoch [3/100], Loss: -12.3335, F1 Score: 0.6832
-Epoch [4/100], Loss: -12.2800, F1 Score: 0.5091
-Epoch [5/100], Loss: -12.3251, F1 Score: 0.5565
-Epoch [6/100], Loss: -12.2546, F1 Score: 0.6400
-Epoch [7/100], Loss: -12.3756, F1 Score: 0.6400
-Epoch [8/100], Loss: -12.3879, F1 Score: 0.7111
-Epoch [9/100], Loss: -12.4322, F1 Score: 0.7111
-Epoch [10/100], Loss: -12.4170, F1 Score: 0.7111
-Epoch [11/100], Loss: -12.3929, F1 Score: 0.7111
-Epoch [12/100], Loss: -12.4136, F1 Score: 0.7111
-Epoch [13/100], Loss: -12.4210, F1 Score: 0.7111
-Epoch [14/100], Loss: -12.3885, F1 Score: 0.7111
-Epoch [15/100], Loss: -12.4643, F1 Score: 0.7111
-Epoch [16/100], Loss: -12.3910, F1 Score: 0.7111
-Epoch [17/100], Loss: -12.4134, F1 Score: 0.7111
-Epoch [18/100], Loss: -12.4291, F1 Score: 0.7111
-Epoch [19/100], Loss: -12.4514, F1 Score: 0.7111
-Epoch [20/100], Loss: -12.4732, F1 Score: 0.7111
-Epoch [21/100], Loss: -12.4043, F1 Score: 0.7111
-Epoch [22/100], Loss: -12.4058, F1 Score: 0.7111
-Epoch [23/100], Loss: -12.4291, F1 Score: 0.7111
-Epoch [24/100], Loss: -12.4192, F1 Score: 0.7111
-Epoch [25/100], Loss: -12.3967, F1 Score: 0.7111
-Epoch [26/100], Loss: -12.4439, F1 Score: 0.7111
-Epoch [27/100], Loss: -12.4187, F1 Score: 0.7111
-Epoch [28/100], Loss: -12.4763, F1 Score: 0.7111
-...
-Training complete.
-
--------------------------------------------------------
-Keys in sub80_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub81_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub82_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub23_0_CSDtest(1).mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub24_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub25_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub27_1_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub27_4_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Subject sub80_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub81_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub82_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub23_0_CSDtest(1).mat: EEG data shape = (30, 120001)
-Subject sub24_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub25_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub27_1_CSD.mat: EEG data shape = (30, 120001)
-Subject sub27_4_CSD.mat: EEG data shape = (30, 120001)
-Epoch [1/100], Loss: -25.2239, F1 Score: 0.4184
-Epoch [2/100], Loss: -25.2652, F1 Score: 0.5534
-Epoch [3/100], Loss: -25.3136, F1 Score: 0.7078
-Epoch [4/100], Loss: -25.3002, F1 Score: 0.7219
-Epoch [5/100], Loss: -25.3402, F1 Score: 0.7219
-Epoch [6/100], Loss: -25.3899, F1 Score: 0.8080
-Epoch [7/100], Loss: -25.4001, F1 Score: 0.8242
-Epoch [8/100], Loss: -25.3944, F1 Score: 0.8832
-Epoch [9/100], Loss: -25.4195, F1 Score: 0.8053
-Epoch [10/100], Loss: -25.4425, F1 Score: 0.8242
-Epoch [11/100], Loss: -25.4795, F1 Score: 0.8423
-...
-Training complete.
-
-Keys in sub80_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub81_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub82_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub23_0_CSDtest(1).mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub24_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub25_0_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub27_1_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Keys in sub27_4_CSD.mat: dict_keys(['__header__', '__version__', '__globals__', 'chanlocs', 'data', 'events', 'srate', 'times'])
-Subject sub80_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub81_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub82_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub23_0_CSDtest(1).mat: EEG data shape = (30, 120001)
-Subject sub24_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub25_0_CSD.mat: EEG data shape = (30, 120001)
-Subject sub27_1_CSD.mat: EEG data shape = (30, 120001)
-Subject sub27_4_CSD.mat: EEG data shape = (30, 120001)
-/Users/derrick/PycharmProjects/DSEN/main.py:58: UserWarning: torch.cholesky is deprecated in favor of torch.linalg.cholesky and will be removed in a future PyTorch release.
-L = torch.cholesky(A)
-should be replaced with
-L = torch.linalg.cholesky(A)
-and
-U = torch.cholesky(A, upper=True)
-should be replaced with
-U = torch.linalg.cholesky(A).mH
-This transform will produce equivalent results for all valid (symmetric positive definite) inputs. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/BatchLinearAlgebra.cpp:1703.)
-  D1 = torch.cholesky(SigmaHat11)
-Loss Classification: 0.6509, Loss CCA: -30.5595, Loss Triplet: 1.0199, Loss Combined: 0.9565
-Epoch [1/50], Combined Loss: 0.9565, Triplet Loss: 1.0199, F1 Score: 0.7653
-Loss Classification: 0.5734, Loss CCA: -29.9671, Loss Triplet: 1.0157, Loss Combined: 0.8731
-Epoch [2/50], Combined Loss: 0.8731, Triplet Loss: 1.0157, F1 Score: 0.8423
-Loss Classification: 0.4818, Loss CCA: -30.3047, Loss Triplet: 0.9988, Loss Combined: 0.7849
-Epoch [3/50], Combined Loss: 0.7849, Triplet Loss: 0.9988, F1 Score: 0.8423
-Loss Classification: 0.4290, Loss CCA: -30.5545, Loss Triplet: 1.0014, Loss Combined: 0.7345
-Epoch [4/50], Combined Loss: 0.7345, Triplet Loss: 1.0014, F1 Score: 0.8423
-Loss Classification: 0.3610, Loss CCA: -30.8399, Loss Triplet: 0.9676, Loss Combined: 0.6694
-Epoch [5/50], Combined Loss: 0.6694, Triplet Loss: 0.9676, F1 Score: 0.8423
-Loss Classification: 0.3615, Loss CCA: -31.4132, Loss Triplet: 0.9993, Loss Combined: 0.6756
-Epoch [6/50], Combined Loss: 0.6756, Triplet Loss: 0.9993, F1 Score: 0.8423
-Loss Classification: 0.3556, Loss CCA: -31.4993, Loss Triplet: 0.9885, Loss Combined: 0.6706
-Epoch [7/50], Combined Loss: 0.6706, Triplet Loss: 0.9885, F1 Score: 0.8423
-Loss Classification: 0.3637, Loss CCA: -32.1273, Loss Triplet: 0.9861, Loss Combined: 0.6849
-Epoch [8/50], Combined Loss: 0.6849, Triplet Loss: 0.9861, F1 Score: 0.8423
-Loss Classification: 0.2617, Loss CCA: -32.8049, Loss Triplet: 0.9701, Loss Combined: 0.5897
-Epoch [9/50], Combined Loss: 0.5897, Triplet Loss: 0.9701, F1 Score: 0.8423
-Loss Classification: 0.3815, Loss CCA: -32.9481, Loss Triplet: 0.9912, Loss Combined: 0.7110
-Epoch [10/50], Combined Loss: 0.7110, Triplet Loss: 0.9912, F1 Score: 0.8423
-Loss Classification: 0.3050, Loss CCA: -33.6185, Loss Triplet: 0.9728, Loss Combined: 0.6412
-Epoch [11/50], Combined Loss: 0.6412, Triplet Loss: 0.9728, F1 Score: 0.8423
-Loss Classification: 0.2826, Loss CCA: -33.1828, Loss Triplet: 0.9665, Loss Combined: 0.6145
-Epoch [12/50], Combined Loss: 0.6145, Triplet Loss: 0.9665, F1 Score: 0.8423
-Loss Classification: 0.2128, Loss CCA: -32.9821, Loss Triplet: 0.9867, Loss Combined: 0.5427
-Epoch [13/50], Combined Loss: 0.5427, Triplet Loss: 0.9867, F1 Score: 0.8423
-Loss Classification: 0.2318, Loss CCA: -32.6331, Loss Triplet: 0.9619, Loss Combined: 0.5581
-Epoch [14/50], Combined Loss: 0.5581, Triplet Loss: 0.9619, F1 Score: 0.8423
-Loss Classification: 0.2359, Loss CCA: -33.6412, Loss Triplet: 0.9498, Loss Combined: 0.5723
-Epoch [15/50], Combined Loss: 0.5723, Triplet Loss: 0.9498, F1 Score: 0.8423
-Loss Classification: 0.2209, Loss CCA: -33.1867, Loss Triplet: 0.9117, Loss Combined: 0.5527
-Epoch [16/50], Combined Loss: 0.5527, Triplet Loss: 0.9117, F1 Score: 0.8423
-Loss Classification: 0.2018, Loss CCA: -33.4125, Loss Triplet: 0.8915, Loss Combined: 0.5359
-Epoch [17/50], Combined Loss: 0.5359, Triplet Loss: 0.8915, F1 Score: 0.8423
-...
-Training complete.
+Subject sub28_5_CSD.mat (ID: 28): EEG data shape = (30, 3600), Label = Stranger
+Subject sub28_6_CSD.mat (ID: 28): EEG data shape = (30, 3600), Label = Stranger
+Subject sub28_7_CSD.mat (ID: 28): EEG data shape = (30, 3600), Label = Stranger
+Subject sub28_9_CSD.mat (ID: 28): EEG data shape = (30, 3600), Label = Stranger
+Subject sub23_0_CSDtest(1).mat (ID: 23): EEG data shape = (30, 3600), Label = Stranger
+Subject sub98_4_CSD.mat (ID: 98): EEG data shape = (30, 3600), Label = Friend
+Subject sub98_5_CSD.mat (ID: 98): EEG data shape = (30, 3600), Label = Friend
+Subject sub98_6_CSD.mat (ID: 98): EEG data shape = (30, 3600), Label = Friend
+Subject sub98_7_CSD.mat (ID: 98): EEG data shape = (30, 3600), Label = Friend
+Subject sub98_9_CSD.mat (ID: 98): EEG data shape = (30, 3600), Label = Friend
+Subject sub101_1_CSD.mat (ID: 101): EEG data shape = (30, 3600), Label = Friend
+Subject sub101_4_CSD.mat (ID: 101): EEG data shape = (30, 3600), Label = Friend
+Subject sub101_5_CSD.mat (ID: 101): EEG data shape = (30, 3600), Label = Friend
+Subject sub101_6_CSD.mat (ID: 101): EEG data shape = (30, 3600), Label = Friend
+Subject sub101_7_CSD.mat (ID: 101): EEG data shape = (30, 3600), Label = Friend
+Subject sub101_9_CSD.mat (ID: 101): EEG data shape = (30, 3600), Label = Friend
+Subject sub102_1_CSD.mat (ID: 102): EEG data shape = (30, 3600), Label = Friend
+Subject sub102_4_CSD.mat (ID: 102): EEG data shape = (30, 3600), Label = Friend
+Subject sub102_5_CSD.mat (ID: 102): EEG data shape = (30, 3600), Label = Friend
+Subject sub102_6_CSD.mat (ID: 102): EEG data shape = (30, 3600), Label = Friend
+Subject sub102_7_CSD.mat (ID: 102): EEG data shape = (30, 3600), Label = Friend
+Subject sub102_9_CSD.mat (ID: 102): EEG data shape = (30, 3600), Label = Friend
+[W NNPACK.cpp:64] Could not initialize NNPACK! Reason: Unsupported hardware.
+Test Accuracy: 0.3939, F1 Score: 0.3180
+Classification Report:
+              precision    recall  f1-score   support
+    Stranger       0.39      0.80      0.52        95
+      Friend       0.44      0.11      0.18       136
+    accuracy                           0.39       231
+   macro avg       0.41      0.46      0.35       231
+weighted avg       0.42      0.39      0.32       231
+Predictions vs Actual Labels:
+Pair 1: Predicted = Stranger, Actual = Stranger
+Pair 2: Predicted = Stranger, Actual = Stranger
+Pair 3: Predicted = Stranger, Actual = Stranger
+Pair 4: Predicted = Stranger, Actual = Stranger
+Pair 5: Predicted = Stranger, Actual = Stranger
+Pair 6: Predicted = Stranger, Actual = Stranger
+Pair 7: Predicted = Friend, Actual = Stranger
+Pair 8: Predicted = Friend, Actual = Stranger
+Pair 9: Predicted = Friend, Actual = Stranger
+Pair 10: Predicted = Stranger, Actual = Stranger
+Pair 11: Predicted = Friend, Actual = Stranger
+Pair 12: Predicted = Friend, Actual = Stranger
+Pair 13: Predicted = Stranger, Actual = Stranger
+Pair 14: Predicted = Stranger, Actual = Stranger
+Pair 15: Predicted = Friend, Actual = Stranger
+Pair 16: Predicted = Stranger, Actual = Stranger
+Pair 17: Predicted = Stranger, Actual = Stranger
+Pair 18: Predicted = Stranger, Actual = Stranger
+Pair 19: Predicted = Stranger, Actual = Stranger
+Pair 20: Predicted = Stranger, Actual = Stranger
+Pair 21: Predicted = Stranger, Actual = Stranger
+Pair 22: Predicted = Stranger, Actual = Stranger
+Pair 23: Predicted = Stranger, Actual = Stranger
+Pair 24: Predicted = Stranger, Actual = Stranger
+Pair 25: Predicted = Stranger, Actual = Stranger
+Pair 26: Predicted = Stranger, Actual = Stranger
+Pair 27: Predicted = Stranger, Actual = Stranger
+Pair 28: Predicted = Stranger, Actual = Stranger
+Pair 29: Predicted = Stranger, Actual = Stranger
+Pair 30: Predicted = Friend, Actual = Stranger
+Pair 31: Predicted = Friend, Actual = Stranger
+Pair 32: Predicted = Stranger, Actual = Stranger
+Pair 33: Predicted = Stranger, Actual = Stranger
+Pair 34: Predicted = Friend, Actual = Stranger
+Pair 35: Predicted = Friend, Actual = Stranger
+Pair 36: Predicted = Stranger, Actual = Stranger
+Pair 37: Predicted = Stranger, Actual = Stranger
+Pair 38: Predicted = Stranger, Actual = Stranger
+Pair 39: Predicted = Stranger, Actual = Stranger
+Pair 40: Predicted = Stranger, Actual = Stranger
+Pair 41: Predicted = Stranger, Actual = Stranger
+Pair 42: Predicted = Stranger, Actual = Stranger
+Pair 43: Predicted = Stranger, Actual = Stranger
+Pair 44: Predicted = Stranger, Actual = Stranger
+Pair 45: Predicted = Stranger, Actual = Stranger
+Pair 46: Predicted = Stranger, Actual = Stranger
+Pair 47: Predicted = Stranger, Actual = Stranger
+Pair 48: Predicted = Stranger, Actual = Stranger
+Pair 49: Predicted = Stranger, Actual = Stranger
+Pair 50: Predicted = Stranger, Actual = Stranger
+Pair 51: Predicted = Friend, Actual = Stranger
+Pair 52: Predicted = Stranger, Actual = Stranger
+Pair 53: Predicted = Stranger, Actual = Stranger
+Pair 54: Predicted = Friend, Actual = Stranger
+Pair 55: Predicted = Stranger, Actual = Stranger
+Pair 56: Predicted = Stranger, Actual = Stranger
+Pair 57: Predicted = Stranger, Actual = Stranger
+Pair 58: Predicted = Stranger, Actual = Stranger
+Pair 59: Predicted = Stranger, Actual = Stranger
+Pair 60: Predicted = Stranger, Actual = Stranger
+Pair 61: Predicted = Stranger, Actual = Stranger
+Pair 62: Predicted = Stranger, Actual = Stranger
+Pair 63: Predicted = Stranger, Actual = Stranger
+Pair 64: Predicted = Stranger, Actual = Stranger
+Pair 65: Predicted = Stranger, Actual = Stranger
+Pair 66: Predicted = Stranger, Actual = Stranger
+Pair 67: Predicted = Stranger, Actual = Stranger
+Pair 68: Predicted = Stranger, Actual = Stranger
+Pair 69: Predicted = Friend, Actual = Stranger
+Pair 70: Predicted = Stranger, Actual = Stranger
+Pair 71: Predicted = Stranger, Actual = Stranger
+Pair 72: Predicted = Friend, Actual = Stranger
+Pair 73: Predicted = Stranger, Actual = Stranger
+Pair 74: Predicted = Stranger, Actual = Stranger
+Pair 75: Predicted = Stranger, Actual = Stranger
+Pair 76: Predicted = Stranger, Actual = Stranger
+Pair 77: Predicted = Stranger, Actual = Stranger
+Pair 78: Predicted = Stranger, Actual = Stranger
+Pair 79: Predicted = Stranger, Actual = Stranger
+Pair 80: Predicted = Stranger, Actual = Stranger
+Pair 81: Predicted = Friend, Actual = Stranger
+Pair 82: Predicted = Friend, Actual = Stranger
+Pair 83: Predicted = Stranger, Actual = Stranger
+Pair 84: Predicted = Stranger, Actual = Stranger
+Pair 85: Predicted = Stranger, Actual = Stranger
+Pair 86: Predicted = Friend, Actual = Stranger
+Pair 87: Predicted = Stranger, Actual = Stranger
+Pair 88: Predicted = Friend, Actual = Stranger
+Pair 89: Predicted = Friend, Actual = Stranger
+Pair 90: Predicted = Stranger, Actual = Stranger
+Pair 91: Predicted = Stranger, Actual = Stranger
+Pair 92: Predicted = Stranger, Actual = Stranger
+Pair 93: Predicted = Stranger, Actual = Stranger
+Pair 94: Predicted = Stranger, Actual = Stranger
+Pair 95: Predicted = Stranger, Actual = Stranger
+Pair 96: Predicted = Stranger, Actual = Friend
+Pair 97: Predicted = Stranger, Actual = Friend
+Pair 98: Predicted = Friend, Actual = Friend
+Pair 99: Predicted = Stranger, Actual = Friend
+Pair 100: Predicted = Stranger, Actual = Friend
+Pair 101: Predicted = Stranger, Actual = Friend
+Pair 102: Predicted = Stranger, Actual = Friend
+Pair 103: Predicted = Friend, Actual = Friend
+Pair 104: Predicted = Stranger, Actual = Friend
+Pair 105: Predicted = Friend, Actual = Friend
+Pair 106: Predicted = Stranger, Actual = Friend
+Pair 107: Predicted = Stranger, Actual = Friend
+Pair 108: Predicted = Stranger, Actual = Friend
+Pair 109: Predicted = Stranger, Actual = Friend
+Pair 110: Predicted = Stranger, Actual = Friend
+Pair 111: Predicted = Stranger, Actual = Friend
+Pair 112: Predicted = Stranger, Actual = Friend
+Pair 113: Predicted = Stranger, Actual = Friend
+Pair 114: Predicted = Stranger, Actual = Friend
+Pair 115: Predicted = Stranger, Actual = Friend
+Pair 116: Predicted = Stranger, Actual = Friend
+Pair 117: Predicted = Friend, Actual = Friend
+Pair 118: Predicted = Stranger, Actual = Friend
+Pair 119: Predicted = Stranger, Actual = Friend
+Pair 120: Predicted = Friend, Actual = Friend
+Pair 121: Predicted = Stranger, Actual = Friend
+Pair 122: Predicted = Stranger, Actual = Friend
+Pair 123: Predicted = Stranger, Actual = Friend
+Pair 124: Predicted = Stranger, Actual = Friend
+Pair 125: Predicted = Stranger, Actual = Friend
+Pair 126: Predicted = Stranger, Actual = Friend
+Pair 127: Predicted = Stranger, Actual = Friend
+Pair 128: Predicted = Stranger, Actual = Friend
+Pair 129: Predicted = Stranger, Actual = Friend
+Pair 130: Predicted = Stranger, Actual = Friend
+Pair 131: Predicted = Friend, Actual = Friend
+Pair 132: Predicted = Stranger, Actual = Friend
+Pair 133: Predicted = Stranger, Actual = Friend
+Pair 134: Predicted = Stranger, Actual = Friend
+Pair 135: Predicted = Stranger, Actual = Friend
+Pair 136: Predicted = Stranger, Actual = Friend
+Pair 137: Predicted = Stranger, Actual = Friend
+Pair 138: Predicted = Stranger, Actual = Friend
+Pair 139: Predicted = Stranger, Actual = Friend
+Pair 140: Predicted = Stranger, Actual = Friend
+Pair 141: Predicted = Stranger, Actual = Friend
+Pair 142: Predicted = Stranger, Actual = Friend
+Pair 143: Predicted = Stranger, Actual = Friend
+Pair 144: Predicted = Stranger, Actual = Friend
+Pair 145: Predicted = Stranger, Actual = Friend
+Pair 146: Predicted = Stranger, Actual = Friend
+Pair 147: Predicted = Friend, Actual = Friend
+Pair 148: Predicted = Stranger, Actual = Friend
+Pair 149: Predicted = Stranger, Actual = Friend
+Pair 150: Predicted = Stranger, Actual = Friend
+Pair 151: Predicted = Stranger, Actual = Friend
+Pair 152: Predicted = Stranger, Actual = Friend
+Pair 153: Predicted = Stranger, Actual = Friend
+Pair 154: Predicted = Stranger, Actual = Friend
+Pair 155: Predicted = Stranger, Actual = Friend
+Pair 156: Predicted = Friend, Actual = Friend
+Pair 157: Predicted = Stranger, Actual = Friend
+Pair 158: Predicted = Stranger, Actual = Friend
+Pair 159: Predicted = Friend, Actual = Friend
+Pair 160: Predicted = Stranger, Actual = Friend
+Pair 161: Predicted = Stranger, Actual = Friend
+Pair 162: Predicted = Stranger, Actual = Friend
+Pair 163: Predicted = Stranger, Actual = Friend
+Pair 164: Predicted = Stranger, Actual = Friend
+Pair 165: Predicted = Stranger, Actual = Friend
+Pair 166: Predicted = Stranger, Actual = Friend
+Pair 167: Predicted = Friend, Actual = Friend
+Pair 168: Predicted = Stranger, Actual = Friend
+Pair 169: Predicted = Stranger, Actual = Friend
+Pair 170: Predicted = Friend, Actual = Friend
+Pair 171: Predicted = Stranger, Actual = Friend
+Pair 172: Predicted = Stranger, Actual = Friend
+Pair 173: Predicted = Stranger, Actual = Friend
+Pair 174: Predicted = Stranger, Actual = Friend
+Pair 175: Predicted = Stranger, Actual = Friend
+Pair 176: Predicted = Stranger, Actual = Friend
+Pair 177: Predicted = Friend, Actual = Friend
+Pair 178: Predicted = Stranger, Actual = Friend
+Pair 179: Predicted = Friend, Actual = Friend
+Pair 180: Predicted = Stranger, Actual = Friend
+Pair 181: Predicted = Stranger, Actual = Friend
+Pair 182: Predicted = Stranger, Actual = Friend
+Pair 183: Predicted = Stranger, Actual = Friend
+Pair 184: Predicted = Stranger, Actual = Friend
+Pair 185: Predicted = Stranger, Actual = Friend
+Pair 186: Predicted = Stranger, Actual = Friend
+Pair 187: Predicted = Stranger, Actual = Friend
+Pair 188: Predicted = Stranger, Actual = Friend
+Pair 189: Predicted = Stranger, Actual = Friend
+Pair 190: Predicted = Stranger, Actual = Friend
+Pair 191: Predicted = Stranger, Actual = Friend
+Pair 192: Predicted = Stranger, Actual = Friend
+Pair 193: Predicted = Stranger, Actual = Friend
+Pair 194: Predicted = Stranger, Actual = Friend
+Pair 195: Predicted = Stranger, Actual = Friend
+Pair 196: Predicted = Stranger, Actual = Friend
+Pair 197: Predicted = Stranger, Actual = Friend
+Pair 198: Predicted = Stranger, Actual = Friend
+Pair 199: Predicted = Stranger, Actual = Friend
+Pair 200: Predicted = Stranger, Actual = Friend
+Pair 201: Predicted = Stranger, Actual = Friend
+Pair 202: Predicted = Stranger, Actual = Friend
+Pair 203: Predicted = Stranger, Actual = Friend
+Pair 204: Predicted = Stranger, Actual = Friend
+Pair 205: Predicted = Stranger, Actual = Friend
+Pair 206: Predicted = Stranger, Actual = Friend
+Pair 207: Predicted = Stranger, Actual = Friend
+Pair 208: Predicted = Stranger, Actual = Friend
+Pair 209: Predicted = Stranger, Actual = Friend
+Pair 210: Predicted = Stranger, Actual = Friend
+Pair 211: Predicted = Stranger, Actual = Friend
+Pair 212: Predicted = Stranger, Actual = Friend
+Pair 213: Predicted = Stranger, Actual = Friend
+Pair 214: Predicted = Friend, Actual = Friend
+Pair 215: Predicted = Stranger, Actual = Friend
+Pair 216: Predicted = Stranger, Actual = Friend
+Pair 217: Predicted = Stranger, Actual = Friend
+Pair 218: Predicted = Friend, Actual = Friend
+Pair 219: Predicted = Stranger, Actual = Friend
+Pair 220: Predicted = Stranger, Actual = Friend
+Pair 221: Predicted = Stranger, Actual = Friend
+Pair 222: Predicted = Stranger, Actual = Friend
+Pair 223: Predicted = Stranger, Actual = Friend
+Pair 224: Predicted = Stranger, Actual = Friend
+Pair 225: Predicted = Stranger, Actual = Friend
+Pair 226: Predicted = Stranger, Actual = Friend
+Pair 227: Predicted = Stranger, Actual = Friend
+Pair 228: Predicted = Stranger, Actual = Friend
+Pair 229: Predicted = Stranger, Actual = Friend
+Pair 230: Predicted = Stranger, Actual = Friend
+Pair 231: Predicted = Stranger, Actual = Friend
