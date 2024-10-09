@@ -451,8 +451,8 @@ if __name__ == '__main__':
     friend_ids = [55, 61, 62, 63, 64, 65, 66, 80, 81, 82, 95, 96, 97, 98, 101, 102]
 
     # List of files
-    friend_files = ['sub80_0_CSD.mat', 'sub81_0_CSD.mat', 'sub82_0_CSD.mat']
-    stranger_files = ['sub23_0_CSDtest(1).mat', 'sub24_0_CSD.mat', 'sub25_0_CSD.mat', 'sub27_1_CSD.mat']
+    friend_files = ['sub63_1_CSD.mat', 'sub63_4_CSD.mat', 'sub63_5_CSD.mat', 'sub63_6_CSD.mat']
+    stranger_files = ['sub24_9_CSD.mat', 'sub25_0_CSD.mat']
     file_names = friend_files + stranger_files
 
     # Load EEG data and labels
@@ -486,7 +486,7 @@ if __name__ == '__main__':
     optimizer_f = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate)
     optimizer_c = torch.optim.Adam(model.classifier.parameters(), lr=learning_rate)
 
-    num_epochs = 10
+    num_epochs = 12
 
     # Training loop
     for epoch in range(num_epochs):
@@ -504,5 +504,6 @@ if __name__ == '__main__':
               f'Triplet Loss: {avg_loss_triplet:.4f}, F1 Score: {f1:.4f}')
 
     print('Training complete.')
-    torch.save(model.state_dict(), 'dsen_model.pth')
-
+    torch.save(model.state_dict(), 'model_dsen.pth')
+    torch.save(optimizer_f.state_dict(), 'optimizer_f.pth')
+    torch.save(optimizer_c.state_dict(), 'optimizer_c.pth')
