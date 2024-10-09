@@ -244,7 +244,7 @@ class DSENModel(nn.Module):
         return logits, h_x1, h_x2
 
 # Load your data from .mat files
-def load_eeg_data_mat(data_dir, file_names):
+def load_eeg_data_mat(data_dir, file_names, friend_ids):
     data = []
     labels = []
     min_length = None  # Keep track of the minimum length
@@ -252,8 +252,6 @@ def load_eeg_data_mat(data_dir, file_names):
     for file_name in file_names:
         mat_file = os.path.join(data_dir, file_name)
         mat = loadmat(mat_file)
-        keys = mat.keys()
-        print(f"Keys in {file_name}: {mat.keys()}")  # For debugging
         # Access the EEG data
         eeg_data = mat['data']  # Use the appropriate key for your EEG data
 
@@ -272,16 +270,17 @@ def load_eeg_data_mat(data_dir, file_names):
         subject_id = int(file_name.split('_')[0][3:])
 
         # Assign labels based on subject IDs
-        if subject_id in [81, 82, 80, 61, 62, 63, 64, 65, 66, 95, 96, 97, 98, 101, 102]:
-            label = 1  # Friends
+        if subject_id in friend_ids:
+            label = 1  # Friend
         else:
             label = 0  # Stranger
 
         data.append(eeg_data)
         labels.append(label)
 
-        # Print data shape for verification
-        #print(f"Loaded {file_name}: EEG data shape = {eeg_data.shape}")
+        # Print data shape and label for verification
+        print(f"Loaded {file_name}: Subject ID = {subject_id}, Assigned Label = {'Friend' if label == 1 else 'Stranger'}, EEG data shape = {eeg_data.shape}")
+
     # Truncate all data to the minimum length
     for i in range(len(data)):
         data[i] = data[i][:, :min_length]  # Truncate to min_length
@@ -441,8 +440,6 @@ def train_model(model, train_loader, optimizer_f, optimizer_c, criterion_classif
     return avg_loss_combined, avg_loss_triplet, f1
 
 
-
-
 if __name__ == '__main__':
     # Device configuration
     device = torch.device('cpu')
@@ -450,23 +447,27 @@ if __name__ == '__main__':
     # Load data from .mat files
     data_dir = '/Users/derrick/PycharmProjects/DSEN'
 
+    # Define friend IDs
+    friend_ids = [55, 61, 62, 63, 64, 65, 66, 80, 81, 82, 95, 96, 97, 98, 101, 102]
+
+    # List of files
     friend_files = ['sub80_0_CSD.mat', 'sub81_0_CSD.mat', 'sub82_0_CSD.mat']
-    stranger_files = ['sub23_0_CSDtest(1).mat', 'sub24_0_CSD.mat', 'sub25_0_CSD.mat', 'sub27_1_CSD.mat', 'sub27_4_CSD.mat']
+    stranger_files = ['sub23_0_CSDtest(1).mat', 'sub24_0_CSD.mat', 'sub25_0_CSD.mat', 'sub27_1_CSD.mat']
     file_names = friend_files + stranger_files
 
     # Load EEG data and labels
-    data, labels = load_eeg_data_mat(data_dir, file_names)
+    data, labels = load_eeg_data_mat(data_dir, file_names, friend_ids)
 
-    # Check data shapes
+    # Check data shapes and labels
     for i, eeg_data in enumerate(data):
-        print(f"Subject {file_names[i]}: EEG data shape = {eeg_data.shape}")
+        print(f"Subject {file_names[i]}: EEG data shape = {eeg_data.shape}, Label = {'Friend' if labels[i] == 1 else 'Stranger'}")
 
     # Create pairs and triplets
     pairs, pair_labels, triplets = create_pairs_and_triplets(data, labels)
 
     # Create dataset and dataloader
     dataset = EEGDataset(pairs, pair_labels, triplets)
-    batch_size = 79  # Adjust based on your data size
+    batch_size = 12  # Adjust based on your data size
     train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
     # Initialize the model
@@ -485,7 +486,7 @@ if __name__ == '__main__':
     optimizer_f = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate)
     optimizer_c = torch.optim.Adam(model.classifier.parameters(), lr=learning_rate)
 
-    num_epochs = 50
+    num_epochs = 10
 
     # Training loop
     for epoch in range(num_epochs):
@@ -503,5 +504,5 @@ if __name__ == '__main__':
               f'Triplet Loss: {avg_loss_triplet:.4f}, F1 Score: {f1:.4f}')
 
     print('Training complete.')
-
+    torch.save(model.state_dict(), 'dsen_model.pth')
 
