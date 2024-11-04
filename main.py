@@ -436,17 +436,18 @@ def train_model(model, train_loader, optimizer_f, optimizer_c, criterion_classif
 
 if __name__ == '__main__':
     # Device configuration
-    device = torch.device('cpu')
-
+    #device = torch.device('cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # Load data from .mat files
-    data_dir = '/Users/derrick/PycharmProjects/DSEN'
+    #data_dir = '/Users/derrick/PycharmProjects/DSEN'
+    data_dir = '/home/derrick/PycharmProjects/DSEN'
 
     # Define friend IDs
     friend_ids = [55, 61, 62, 63, 64, 65, 66, 80, 81, 82, 95, 96, 97, 98, 101, 102]
 
     # List of files
-    friend_files = ['sub97_6_CSD.mat', 'sub97_7_CSD.mat', 'sub97_9_CSD.mat', 'sub98_1_CSD.mat']
-    stranger_files = ['sub28_1_CSD.mat', 'sub28_4_CSD.mat']
+    friend_files = ['sub61_1_CSD.mat','sub61_4_CSD.mat','sub61_5_CSD.mat','sub61_6_CSD.mat','sub61_7_CSD.mat','sub61_9_CSD.mat','sub62_1_CSD.mat','sub62_4_CSD.mat','sub62_5_CSD.mat','sub62_6_CSD.mat','sub62_7_CSD.mat','sub62_9_CSD.mat','sub63_1_CSD.mat','sub63_4_CSD.mat','sub63_5_CSD.mat','sub63_6_CSD.mat','sub63_7_CSD.mat','sub63_9_CSD.mat','sub64_1_CSD.mat','sub64_4_CSD.mat','sub64_5_CSD.mat','sub64_6_CSD.mat','sub64_7_CSD.mat','sub64_9_CSD.mat','sub65_1_CSD.mat','sub65_4_CSD.mat','sub65_5_CSD.mat','sub65_6_CSD.mat','sub65_7_CSD.mat','sub65_9_CSD.mat','sub66_1_CSD.mat','sub66_4_CSD.mat','sub66_5_CSD.mat','sub66_6_CSD.mat','sub66_7_CSD.mat','sub66_9_CSD.mat','sub80_0_CSD.mat','sub81_0_CSD.mat','sub82_0_CSD.mat','sub95_1_CSD.mat','sub95_4_CSD.mat','sub95_5_CSD.mat','sub95_6_CSD.mat','sub95_7_CSD.mat','sub95_9_CSD.mat','sub96_1_CSD.mat','sub96_4_CSD.mat','sub96_5_CSD.mat','sub96_6_CSD.mat','sub96_7_CSD.mat','sub96_9_CSD.mat','sub97_1_CSD.mat','sub97_4_CSD.mat','sub97_5_CSD.mat','sub97_6_CSD.mat','sub97_7_CSD.mat','sub97_9_CSD.mat', 'sub98_1_CSD.mat']
+    stranger_files = ['sub24_1_CSD.mat','sub24_4_CSD.mat','sub24_5_CSD.mat','sub24_6_CSD.mat','sub24_7_CSD.mat','sub24_9_CSD.mat','sub25_1_CSD.mat','sub25_4_CSD.mat','sub25_5_CSD.mat','sub25_6_CSD.mat','sub25_7_CSD.mat','sub25_9_CSD.mat','sub26_1_CSD.mat','sub26_4_CSD.mat','sub26_5_CSD.mat','sub26_6_CSD.mat','sub26_7_CSD.mat','sub26_9_CSD.mat','sub27_1_CSD.mat','sub27_4_CSD.mat','sub27_5_CSD.mat','sub27_6_CSD.mat','sub27_7_CSD.mat','sub27_9_CSD.mat', 'sub28_1_CSD.mat','sub28_4_CSD.mat']
     file_names = friend_files + stranger_files
 
     # Load EEG data and labels
@@ -461,7 +462,7 @@ if __name__ == '__main__':
 
     # Create dataset and dataloader
     dataset = EEGDataset(pairs, pair_labels, triplets)
-    batch_size = 6  # Adjust based on your data size
+    batch_size = 79  # Adjust based on your data size
     train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
     # Initialize the model
@@ -480,7 +481,7 @@ if __name__ == '__main__':
     optimizer_f = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate)
     optimizer_c = torch.optim.Adam(model.classifier.parameters(), lr=learning_rate)
 
-    num_epochs = 12
+    num_epochs = 100
 
     # Training loop
     for epoch in range(num_epochs):

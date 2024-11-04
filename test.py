@@ -12,7 +12,7 @@ from scipy.signal import resample
 # Import your model and other necessary classes
 from main import DSENModel  # Ensure main.py is structured properly for import
 
-friend_ids = [55, 61, 62, 63, 64, 65, 66, 80, 81, 82, 95, 96, 97, 98, 101, 102]
+friend_ids = [61, 62, 63, 64, 65, 66, 80, 81, 82, 95, 96, 97, 98, 101, 102]
 # Function to preprocess EEG data
 def preprocess_eeg_data(eeg_data, target_time_len=3600, target_fs=200):
     num_channels, original_time_len = eeg_data.shape
@@ -123,14 +123,16 @@ def test_model(model, test_loader, device, actual_labels):
     )
     return accuracy, f1, report, all_preds
 
+
 if __name__ == '__main__':
     # Device configuration
-    device = torch.device('cpu')  # Change to 'cuda' if using GPU
+    #device = torch.device('cpu')  # Change to 'cuda' if using GPU
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Define friend IDs (for evaluation purposes)
 
     # Load the saved model
-    model_path = 'dsen_model.pth'  # Ensure this points to your model file
+    model_path = 'model_dsen.pth'  # Ensure this points to your model file
     num_channels = 30  # Update based on your data
     time_len = 3600    # Update based on your data
     model = DSENModel(num_channels=num_channels, time_len=time_len).to(device)
@@ -138,8 +140,9 @@ if __name__ == '__main__':
     model.eval()
 
     # Load and preprocess test data
-    data_dir = '/Users/derrick/PycharmProjects/DSEN'  # Update with your test data directory
-    test_files = ['sub64_9_CSD.mat', 'sub64_7_CSD.mat']  # Update with your test file names
+    # data_dir = '/Users/derrick/PycharmProjects/DSEN'  # Update with your test data directory
+    data_dir = '/home/derrick/PycharmProjects/DSEN'  # Update with your test data directory
+    test_files = ['sub28_5_CSD.mat', 'sub28_6_CSD.mat', 'sub28_7_CSD.mat', 'sub28_9_CSD.mat', 'sub23_0_CSDtest(1).mat', 'sub98_4_CSD.mat', 'sub98_5_CSD.mat','sub98_6_CSD.mat','sub98_7_CSD.mat','sub98_9_CSD.mat','sub101_1_CSD.mat','sub101_4_CSD.mat','sub101_5_CSD.mat','sub101_6_CSD.mat','sub101_7_CSD.mat','sub101_9_CSD.mat','sub102_1_CSD.mat','sub102_4_CSD.mat','sub102_5_CSD.mat','sub102_6_CSD.mat','sub102_7_CSD.mat','sub102_9_CSD.mat','sub24_0_CSD.mat','sub25_0_CSD.mat']  # Update with your test file names
 
     data, labels, subject_ids = load_and_preprocess_eeg_data(data_dir, test_files)
 
@@ -176,6 +179,5 @@ if __name__ == '__main__':
     for idx, pred in enumerate(all_preds):
         actual_label = actual_labels[idx]
         print(f'Pair {idx+1}: Predicted = {"Friend" if pred == 1 else "Stranger"}, Actual = {"Friend" if actual_label == 1 else "Stranger"}')
-
 
 
