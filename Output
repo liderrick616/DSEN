@@ -20,15 +20,17 @@ Subject sub102_5_CSD.mat (ID: 102): EEG data shape = (30, 3600), Label = Friend
 Subject sub102_6_CSD.mat (ID: 102): EEG data shape = (30, 3600), Label = Friend
 Subject sub102_7_CSD.mat (ID: 102): EEG data shape = (30, 3600), Label = Friend
 Subject sub102_9_CSD.mat (ID: 102): EEG data shape = (30, 3600), Label = Friend
-[W NNPACK.cpp:64] Could not initialize NNPACK! Reason: Unsupported hardware.
-Test Accuracy: 0.3939, F1 Score: 0.3180
+Test Accuracy: 0.6156, F1 Score: 0.4008
 Classification Report:
               precision    recall  f1-score   support
-    Stranger       0.39      0.80      0.52        95
-      Friend       0.44      0.11      0.18       136
-    accuracy                           0.39       231
-   macro avg       0.41      0.46      0.35       231
-weighted avg       0.42      0.39      0.32       231
+
+    Stranger       0.41      0.92      0.56        95
+      Friend       0.53      0.07      0.12       136
+
+    accuracy                           0.42       231
+   macro avg       0.47      0.49      0.34       231
+weighted avg       0.48      0.42      0.30       231
+
 Predictions vs Actual Labels:
 Pair 1: Predicted = Stranger, Actual = Stranger
 Pair 2: Predicted = Stranger, Actual = Stranger
@@ -36,15 +38,15 @@ Pair 3: Predicted = Stranger, Actual = Stranger
 Pair 4: Predicted = Stranger, Actual = Stranger
 Pair 5: Predicted = Stranger, Actual = Stranger
 Pair 6: Predicted = Stranger, Actual = Stranger
-Pair 7: Predicted = Friend, Actual = Stranger
-Pair 8: Predicted = Friend, Actual = Stranger
-Pair 9: Predicted = Friend, Actual = Stranger
+Pair 7: Predicted = Stranger, Actual = Stranger
+Pair 8: Predicted = Stranger, Actual = Stranger
+Pair 9: Predicted = Stranger, Actual = Stranger
 Pair 10: Predicted = Stranger, Actual = Stranger
-Pair 11: Predicted = Friend, Actual = Stranger
-Pair 12: Predicted = Friend, Actual = Stranger
+Pair 11: Predicted = Stranger, Actual = Stranger
+Pair 12: Predicted = Stranger, Actual = Stranger
 Pair 13: Predicted = Stranger, Actual = Stranger
 Pair 14: Predicted = Stranger, Actual = Stranger
-Pair 15: Predicted = Friend, Actual = Stranger
+Pair 15: Predicted = Stranger, Actual = Stranger
 Pair 16: Predicted = Stranger, Actual = Stranger
 Pair 17: Predicted = Stranger, Actual = Stranger
 Pair 18: Predicted = Stranger, Actual = Stranger
@@ -59,15 +61,15 @@ Pair 26: Predicted = Stranger, Actual = Stranger
 Pair 27: Predicted = Stranger, Actual = Stranger
 Pair 28: Predicted = Stranger, Actual = Stranger
 Pair 29: Predicted = Stranger, Actual = Stranger
-Pair 30: Predicted = Friend, Actual = Stranger
-Pair 31: Predicted = Friend, Actual = Stranger
-Pair 32: Predicted = Stranger, Actual = Stranger
+Pair 30: Predicted = Stranger, Actual = Stranger
+Pair 31: Predicted = Stranger, Actual = Stranger
+Pair 32: Predicted = Friend, Actual = Stranger
 Pair 33: Predicted = Stranger, Actual = Stranger
-Pair 34: Predicted = Friend, Actual = Stranger
+Pair 34: Predicted = Stranger, Actual = Stranger
 Pair 35: Predicted = Friend, Actual = Stranger
 Pair 36: Predicted = Stranger, Actual = Stranger
 Pair 37: Predicted = Stranger, Actual = Stranger
-Pair 38: Predicted = Stranger, Actual = Stranger
+Pair 38: Predicted = Friend, Actual = Stranger
 Pair 39: Predicted = Stranger, Actual = Stranger
 Pair 40: Predicted = Stranger, Actual = Stranger
 Pair 41: Predicted = Stranger, Actual = Stranger
@@ -83,10 +85,10 @@ Pair 50: Predicted = Stranger, Actual = Stranger
 Pair 51: Predicted = Friend, Actual = Stranger
 Pair 52: Predicted = Stranger, Actual = Stranger
 Pair 53: Predicted = Stranger, Actual = Stranger
-Pair 54: Predicted = Friend, Actual = Stranger
+Pair 54: Predicted = Stranger, Actual = Stranger
 Pair 55: Predicted = Stranger, Actual = Stranger
 Pair 56: Predicted = Stranger, Actual = Stranger
-Pair 57: Predicted = Stranger, Actual = Stranger
+Pair 57: Predicted = Friend, Actual = Stranger
 Pair 58: Predicted = Stranger, Actual = Stranger
 Pair 59: Predicted = Stranger, Actual = Stranger
 Pair 60: Predicted = Stranger, Actual = Stranger
@@ -98,27 +100,27 @@ Pair 65: Predicted = Stranger, Actual = Stranger
 Pair 66: Predicted = Stranger, Actual = Stranger
 Pair 67: Predicted = Stranger, Actual = Stranger
 Pair 68: Predicted = Stranger, Actual = Stranger
-Pair 69: Predicted = Friend, Actual = Stranger
+Pair 69: Predicted = Stranger, Actual = Stranger
 Pair 70: Predicted = Stranger, Actual = Stranger
 Pair 71: Predicted = Stranger, Actual = Stranger
 Pair 72: Predicted = Friend, Actual = Stranger
 Pair 73: Predicted = Stranger, Actual = Stranger
 Pair 74: Predicted = Stranger, Actual = Stranger
-Pair 75: Predicted = Stranger, Actual = Stranger
+Pair 75: Predicted = Friend, Actual = Stranger
 Pair 76: Predicted = Stranger, Actual = Stranger
 Pair 77: Predicted = Stranger, Actual = Stranger
 Pair 78: Predicted = Stranger, Actual = Stranger
 Pair 79: Predicted = Stranger, Actual = Stranger
 Pair 80: Predicted = Stranger, Actual = Stranger
-Pair 81: Predicted = Friend, Actual = Stranger
-Pair 82: Predicted = Friend, Actual = Stranger
+Pair 81: Predicted = Stranger, Actual = Stranger
+Pair 82: Predicted = Stranger, Actual = Stranger
 Pair 83: Predicted = Stranger, Actual = Stranger
 Pair 84: Predicted = Stranger, Actual = Stranger
 Pair 85: Predicted = Stranger, Actual = Stranger
 Pair 86: Predicted = Friend, Actual = Stranger
 Pair 87: Predicted = Stranger, Actual = Stranger
-Pair 88: Predicted = Friend, Actual = Stranger
-Pair 89: Predicted = Friend, Actual = Stranger
+Pair 88: Predicted = Stranger, Actual = Stranger
+Pair 89: Predicted = Stranger, Actual = Stranger
 Pair 90: Predicted = Stranger, Actual = Stranger
 Pair 91: Predicted = Stranger, Actual = Stranger
 Pair 92: Predicted = Stranger, Actual = Stranger
@@ -127,17 +129,17 @@ Pair 94: Predicted = Stranger, Actual = Stranger
 Pair 95: Predicted = Stranger, Actual = Stranger
 Pair 96: Predicted = Stranger, Actual = Friend
 Pair 97: Predicted = Stranger, Actual = Friend
-Pair 98: Predicted = Friend, Actual = Friend
+Pair 98: Predicted = Stranger, Actual = Friend
 Pair 99: Predicted = Stranger, Actual = Friend
 Pair 100: Predicted = Stranger, Actual = Friend
 Pair 101: Predicted = Stranger, Actual = Friend
 Pair 102: Predicted = Stranger, Actual = Friend
-Pair 103: Predicted = Friend, Actual = Friend
+Pair 103: Predicted = Stranger, Actual = Friend
 Pair 104: Predicted = Stranger, Actual = Friend
-Pair 105: Predicted = Friend, Actual = Friend
+Pair 105: Predicted = Stranger, Actual = Friend
 Pair 106: Predicted = Stranger, Actual = Friend
 Pair 107: Predicted = Stranger, Actual = Friend
-Pair 108: Predicted = Stranger, Actual = Friend
+Pair 108: Predicted = Friend, Actual = Friend
 Pair 109: Predicted = Stranger, Actual = Friend
 Pair 110: Predicted = Stranger, Actual = Friend
 Pair 111: Predicted = Stranger, Actual = Friend
@@ -149,7 +151,7 @@ Pair 116: Predicted = Stranger, Actual = Friend
 Pair 117: Predicted = Friend, Actual = Friend
 Pair 118: Predicted = Stranger, Actual = Friend
 Pair 119: Predicted = Stranger, Actual = Friend
-Pair 120: Predicted = Friend, Actual = Friend
+Pair 120: Predicted = Stranger, Actual = Friend
 Pair 121: Predicted = Stranger, Actual = Friend
 Pair 122: Predicted = Stranger, Actual = Friend
 Pair 123: Predicted = Stranger, Actual = Friend
@@ -173,22 +175,22 @@ Pair 140: Predicted = Stranger, Actual = Friend
 Pair 141: Predicted = Stranger, Actual = Friend
 Pair 142: Predicted = Stranger, Actual = Friend
 Pair 143: Predicted = Stranger, Actual = Friend
-Pair 144: Predicted = Stranger, Actual = Friend
+Pair 144: Predicted = Friend, Actual = Friend
 Pair 145: Predicted = Stranger, Actual = Friend
 Pair 146: Predicted = Stranger, Actual = Friend
-Pair 147: Predicted = Friend, Actual = Friend
+Pair 147: Predicted = Stranger, Actual = Friend
 Pair 148: Predicted = Stranger, Actual = Friend
 Pair 149: Predicted = Stranger, Actual = Friend
 Pair 150: Predicted = Stranger, Actual = Friend
 Pair 151: Predicted = Stranger, Actual = Friend
 Pair 152: Predicted = Stranger, Actual = Friend
 Pair 153: Predicted = Stranger, Actual = Friend
-Pair 154: Predicted = Stranger, Actual = Friend
+Pair 154: Predicted = Friend, Actual = Friend
 Pair 155: Predicted = Stranger, Actual = Friend
 Pair 156: Predicted = Friend, Actual = Friend
 Pair 157: Predicted = Stranger, Actual = Friend
 Pair 158: Predicted = Stranger, Actual = Friend
-Pair 159: Predicted = Friend, Actual = Friend
+Pair 159: Predicted = Stranger, Actual = Friend
 Pair 160: Predicted = Stranger, Actual = Friend
 Pair 161: Predicted = Stranger, Actual = Friend
 Pair 162: Predicted = Stranger, Actual = Friend
@@ -199,7 +201,7 @@ Pair 166: Predicted = Stranger, Actual = Friend
 Pair 167: Predicted = Friend, Actual = Friend
 Pair 168: Predicted = Stranger, Actual = Friend
 Pair 169: Predicted = Stranger, Actual = Friend
-Pair 170: Predicted = Friend, Actual = Friend
+Pair 170: Predicted = Stranger, Actual = Friend
 Pair 171: Predicted = Stranger, Actual = Friend
 Pair 172: Predicted = Stranger, Actual = Friend
 Pair 173: Predicted = Stranger, Actual = Friend
@@ -208,7 +210,7 @@ Pair 175: Predicted = Stranger, Actual = Friend
 Pair 176: Predicted = Stranger, Actual = Friend
 Pair 177: Predicted = Friend, Actual = Friend
 Pair 178: Predicted = Stranger, Actual = Friend
-Pair 179: Predicted = Friend, Actual = Friend
+Pair 179: Predicted = Stranger, Actual = Friend
 Pair 180: Predicted = Stranger, Actual = Friend
 Pair 181: Predicted = Stranger, Actual = Friend
 Pair 182: Predicted = Stranger, Actual = Friend
@@ -242,12 +244,12 @@ Pair 209: Predicted = Stranger, Actual = Friend
 Pair 210: Predicted = Stranger, Actual = Friend
 Pair 211: Predicted = Stranger, Actual = Friend
 Pair 212: Predicted = Stranger, Actual = Friend
-Pair 213: Predicted = Stranger, Actual = Friend
-Pair 214: Predicted = Friend, Actual = Friend
+Pair 213: Predicted = Friend, Actual = Friend
+Pair 214: Predicted = Stranger, Actual = Friend
 Pair 215: Predicted = Stranger, Actual = Friend
 Pair 216: Predicted = Stranger, Actual = Friend
 Pair 217: Predicted = Stranger, Actual = Friend
-Pair 218: Predicted = Friend, Actual = Friend
+Pair 218: Predicted = Stranger, Actual = Friend
 Pair 219: Predicted = Stranger, Actual = Friend
 Pair 220: Predicted = Stranger, Actual = Friend
 Pair 221: Predicted = Stranger, Actual = Friend
