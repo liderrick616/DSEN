@@ -50,6 +50,7 @@ class TripletLoss(nn.Module):
 
 
 # Slide 9
+"""
 class CCALoss(nn.Module):
     def __init__(self):
         super(CCALoss, self).__init__()
@@ -85,6 +86,43 @@ class CCALoss(nn.Module):
         corr = torch.sum(S) # Sum of the canonical correlations.
         loss = -corr  # Negative of the total correlation.
         return loss
+"""
+
+class CCALoss(nn.Module):
+    def __init__(self):
+        super(CCALoss, self).__init__()
+
+    def forward(self, H1, H2):
+        eps = 1e-10  # Small constant to prevent division by zero
+
+        # Center the variables
+        H1_centered = H1 - H1.mean(dim=0)
+        H2_centered = H2 - H2.mean(dim=0)
+
+        # Compute covariance matrices
+        N = H1.size(0) - 1  # Adjust for unbiased estimate
+
+        # Cross-covariance
+        SigmaHat12 = (1.0 / N) * H1_centered.t().mm(H2_centered)
+
+        # Variances
+        SigmaHat11 = (1.0 / N) * H1_centered.t().mm(H1_centered) + eps * torch.eye(H1.size(1)).to(H1.device)
+        SigmaHat22 = (1.0 / N) * H2_centered.t().mm(H2_centered) + eps * torch.eye(H2.size(1)).to(H2.device)
+
+        # Compute the trace of covariance matrices
+        trace_SigmaHat11 = torch.trace(SigmaHat11)
+        trace_SigmaHat22 = torch.trace(SigmaHat22)
+
+        # Compute the correlation coefficient
+        corr_num = torch.trace(SigmaHat12)
+        corr_den = torch.sqrt(trace_SigmaHat11 * trace_SigmaHat22)
+
+        corr = corr_num / (corr_den + eps)  # Add eps to denominator to prevent division by zero
+
+        # Negative correlation as loss
+        loss = -corr
+        return loss
+
 
 
 # Slide 6,7
