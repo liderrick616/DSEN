@@ -40,7 +40,7 @@ Test Accuracy: 0.3395, F1 Score: 0.2927
 Classification Report:
               precision    recall  f1-score   support
 
-    Stranger       0.96      0.15      0.62       459
+    Stranger       0.96      0.15      0.26       459
       Friend       0.25      0.98      0.40       136
 
     accuracy                           0.34       595
