@@ -694,7 +694,8 @@ if __name__ == '__main__':
     #device = torch.device('cpu')
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # Load data from .mat files
-    data_dir = '/home/derrick/PycharmProjects/datayx/hyperemotion1/subA'
+    #data_dir = '/home/derrick/PycharmProjects/datayx/hyperemotion1/subA'
+    data_dir = '/home/derrick/PycharmProjects/datayx/hyperemotion9/subA'
 
     """
         '/home/derrick/PycharmProjects/datayx/hyperemotion4/subA',
@@ -709,12 +710,12 @@ if __name__ == '__main__':
      47,48,49,50,51,52,53,54,57,58,59,60,67,68,69,70,73,74,75,77,78,79,80,81,82,83,84,85,86,105,106,107,108,111,112,
      131,132,137,138,143,144,153,154,159,160,161,162,179,180,42,55,56,61,62,63,64,65,66,71,72,87,88,89,90,91,92,93,94,
                   99,100,109,110,113,114,115,116,121,122,127,128,129,130,133,134,135,136,139,140,141,142,145,146,147,
-                  148,149,150151,152,155,156,157,158,163,164,165,166,167,168,169,170,175,176,177,178,189,190,199,200,
+                  148,149,150,151,152,155,156,157,158,163,164,165,166,167,168,169,170,175,176,177,178,189,190,199,200,
                   201,202,203,204,205,206]
     Fs = 256  # Example sampling frequency
     LowBand = 13  # Beta band lower edge
     HighBand = 45  # gamma band upper edge
-
+    """ #1 
     file_names = [
         '101_CleanData.mat', '102_CleanData.mat', '103_CleanData.mat', '105_CleanData.mat',
         '106_CleanData.mat', '107_CleanData.mat', '108_CleanData.mat', '109_CleanData.mat', '110_CleanData.mat',
@@ -750,6 +751,43 @@ if __name__ == '__main__':
         '82_CleanData.mat', '83_CleanData.mat', '84_CleanData.mat', '85_CleanData.mat', '86_CleanData.mat',
         '87_CleanData.mat', '88_CleanData.mat', '92_CleanData.mat', '93_CleanData.mat', '95_CleanData.mat',
         '96_CleanData.mat', '97_CleanData.mat', '98_CleanData.mat'
+    ]
+    """#9
+    file_names = [
+        '101_CleanData.mat', '102_CleanData.mat', '103_CleanData.mat', '105_CleanData.mat',
+        '106_CleanData.mat', '107_CleanData.mat', '108_CleanData.mat', '109_CleanData.mat', '110_CleanData.mat',
+        '111_CleanData.mat', '113_CleanData.mat', '114_CleanData.mat', '115_CleanData.mat', '116_CleanData.mat',
+        '117_CleanData.mat', '118_CleanData.mat', '119_CleanData.mat', '120_CleanData.mat', '121_CleanData.mat',
+        '122_CleanData.mat', '123_CleanData.mat', '124_CleanData.mat', '125_CleanData.mat', '126_CleanData.mat',
+        '127_CleanData.mat', '128_CleanData.mat', '129_CleanData.mat', '130_CleanData.mat', '131_CleanData.mat',
+        '132_CleanData.mat', '133_CleanData.mat', '134_CleanData.mat', '135_CleanData.mat', '136_CleanData.mat',
+        '137_CleanData.mat', '138_CleanData.mat', '139_CleanData.mat', '140_CleanData.mat', '141_CleanData.mat',
+        '142_CleanData.mat', '143_CleanData.mat', '144_CleanData.mat', '145_CleanData.mat', '146_CleanData.mat',
+        '147_CleanData.mat', '148_CleanData.mat', '149_CleanData.mat', '150_CleanData.mat', '151_CleanData.mat',
+        '152_CleanData.mat', '153_CleanData.mat', '154_CleanData.mat', '155_CleanData.mat', '156_CleanData.mat',
+        '157_CleanData.mat', '158_CleanData.mat', '159_CleanData.mat', '160_CleanData.mat', '161_CleanData.mat',
+        '162_CleanData.mat', '163_CleanData.mat', '164_CleanData.mat', '165_CleanData.mat', '166_CleanData.mat',
+        '167_CleanData.mat', '168_CleanData.mat', '169_CleanData.mat', '170_CleanData.mat', '171_CleanData.mat',
+        '172_CleanData.mat', '175_CleanData.mat', '176_CleanData.mat', '177_CleanData.mat', '178_CleanData.mat',
+        '179_CleanData.mat', '180_CleanData.mat', '181_CleanData.mat', '182_CleanData.mat', '183_CleanData.mat',
+        '184_CleanData.mat', '185_CleanData.mat', '186_CleanData.mat', '187_CleanData.mat', '188_CleanData.mat',
+        '189_CleanData.mat', '190_CleanData.mat', '191_CleanData.mat', '192_CleanData.mat', '193_CleanData.mat',
+        '194_CleanData.mat', '195_CleanData.mat', '196_CleanData.mat', '197_CleanData.mat', '198_CleanData.mat',
+        '199_CleanData.mat', '200_CleanData.mat', '201_CleanData.mat', '202_CleanData.mat', '203_CleanData.mat',
+        '204_CleanData.mat', '23_CleanData.mat', '24_CleanData.mat', '25_CleanData.mat', '26_CleanData.mat',
+        '27_CleanData.mat', '28_CleanData.mat', '29_CleanData.mat', '30_CleanData.mat', '31_CleanData.mat',
+        '34_CleanData.mat', '35_CleanData.mat', '36_CleanData.mat', '37_CleanData.mat', '38_CleanData.mat',
+        '39_CleanData.mat', '41_CleanData.mat', '42_CleanData.mat', '43_CleanData.mat', '44_CleanData.mat',
+        '47_CleanData.mat', '48_CleanData.mat', '49_CleanData.mat', '50_CleanData.mat', '51_CleanData.mat',
+        '52_CleanData.mat', '53_CleanData.mat', '55_CleanData.mat', '56_CleanData.mat',
+        '57_CleanData.mat', '58_CleanData.mat', '59_CleanData.mat', '60_CleanData.mat', '61_CleanData.mat',
+        '62_CleanData.mat', '63_CleanData.mat', '64_CleanData.mat', '65_CleanData.mat', '66_CleanData.mat',
+        '67_CleanData.mat', '68_CleanData.mat', '69_CleanData.mat', '70_CleanData.mat', '71_CleanData.mat',
+        '72_CleanData.mat', '73_CleanData.mat', '74_CleanData.mat', '75_CleanData.mat', '76_CleanData.mat',
+        '77_CleanData.mat', '78_CleanData.mat', '79_CleanData.mat', '80_CleanData.mat', '81_CleanData.mat',
+        '82_CleanData.mat', '83_CleanData.mat', '84_CleanData.mat', '85_CleanData.mat', '86_CleanData.mat',
+        '87_CleanData.mat', '88_CleanData.mat', '92_CleanData.mat', '93_CleanData.mat', '95_CleanData.mat',
+        '96_CleanData.mat', '97_CleanData.mat', '98_CleanData.mat', '100_CleanData.mat', '99_CleanData.mat'
     ]
 
     #file_names = collect_files(file_name, data_dir)
