@@ -577,51 +577,548 @@ def train_model(model, train_loader, optimizer_f, optimizer_c, criterion_classif
 if __name__ == '__main__':
     # Device configuration
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
     # Load data from .mat files
-    data_dir = '/home/derrick/PycharmProjects/datayx/hyperemotion4/subB'
+    data_dir1 = '/home/derrick/PycharmProjects/datayx/hyperemotion1/subB'
+    data_dir4 = '/home/derrick/PycharmProjects/datayx/hyperemotion4/subB'
+    data_dir5 = '/home/derrick/PycharmProjects/datayx/hyperemotion5/subB'  # Update with your test data directory
+    data_dir6 = '/home/derrick/PycharmProjects/datayx/hyperemotion6/subB'
+    data_dir7 = '/home/derrick/PycharmProjects/datayx/hyperemotion7/subB'
+    data_dir9 = '/home/derrick/PycharmProjects/datayx/hyperemotion9/subB'
 
     friend_ids = [11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44,45,46,
      47,48,49,50,51,52,53,54,57,58,59,60,67,68,69,70,73,74,75,77,78,79,80,81,82,83,84,85,86,105,106,107,108,111,112,
      131,132,137,138,143,144,153,154,159,160,161,162,179,180,42,55,56,61,62,63,64,65,66,71,72,87,88,89,90,91,92,93,94,
                   99,100,109,110,113,114,115,116,121,122,127,128,129,130,133,134,135,136,139,140,141,142,145,146,147,
-                  148,149,150151,152,155,156,157,158,163,164,165,166,167,168,169,170,175,176,177,178,189,190,199,200,
+                  148,149,150,151,152,155,156,157,158,163,164,165,166,167,168,169,170,175,176,177,178,189,190,199,200,
                   201,202,203,204,205,206]
-
     file_names = [
-        'obtainPLValue_101.mat', 'obtainPLValue_137.mat', 'obtainPLValue_175.mat', 'obtainPLValue_29.mat',
+        'obtainPLValue_101.mat',
+        'obtainPLValue_103.mat',
+        'obtainPLValue_105.mat',
+        'obtainPLValue_107.mat',
+        'obtainPLValue_109.mat',
+        'obtainPLValue_113.mat',
+        'obtainPLValue_115.mat',
+        'obtainPLValue_117.mat',
+        'obtainPLValue_119.mat',
+        'obtainPLValue_121.mat',
+        'obtainPLValue_123.mat',
+        'obtainPLValue_127.mat',
+        'obtainPLValue_129.mat',
+        'obtainPLValue_131.mat',
+        'obtainPLValue_133.mat',
+        'obtainPLValue_135.mat',
+        'obtainPLValue_137.mat',
+        'obtainPLValue_139.mat',
+        'obtainPLValue_141.mat',
+        'obtainPLValue_143.mat',
+        'obtainPLValue_145.mat',
+        'obtainPLValue_147.mat',
+        'obtainPLValue_149.mat',
+        'obtainPLValue_151.mat',
+        'obtainPLValue_153.mat',
+        'obtainPLValue_155.mat',
+        'obtainPLValue_157.mat',
+        'obtainPLValue_159.mat',
+        'obtainPLValue_161.mat',
+        'obtainPLValue_163.mat',
+        'obtainPLValue_165.mat',
+        'obtainPLValue_167.mat',
+        'obtainPLValue_169.mat',
+        'obtainPLValue_171.mat',
+        'obtainPLValue_175.mat',
+        'obtainPLValue_177.mat',
+        'obtainPLValue_179.mat',
+        'obtainPLValue_181.mat',
+        'obtainPLValue_183.mat',
+        'obtainPLValue_185.mat',
+        'obtainPLValue_187.mat',
+        'obtainPLValue_189.mat',
+        'obtainPLValue_191.mat',
+        'obtainPLValue_193.mat',
+        'obtainPLValue_195.mat',
+        'obtainPLValue_199.mat',
+        'obtainPLValue_201.mat',
+        'obtainPLValue_203.mat',
+        'obtainPLValue_23.mat',
+        'obtainPLValue_25.mat',
+        'obtainPLValue_27.mat',
+        'obtainPLValue_29.mat',
+        'obtainPLValue_35.mat',
+        'obtainPLValue_37.mat',
+        'obtainPLValue_41.mat',
+        'obtainPLValue_43.mat',
+        'obtainPLValue_47.mat',
+        'obtainPLValue_49.mat',
+        'obtainPLValue_51.mat',
+        'obtainPLValue_53.mat',
+        'obtainPLValue_55.mat',
+        'obtainPLValue_57.mat',
+        'obtainPLValue_59.mat',
+        'obtainPLValue_61.mat',
+        'obtainPLValue_63.mat',
+        'obtainPLValue_65.mat',
+        'obtainPLValue_67.mat',
+        'obtainPLValue_69.mat',
         'obtainPLValue_71.mat',
-        'obtainPLValue_103.mat', 'obtainPLValue_139.mat', 'obtainPLValue_177.mat',
-        'obtainPLValue_73.mat'
+        'obtainPLValue_73.mat',
+        'obtainPLValue_75.mat',
+        'obtainPLValue_77.mat',
+        'obtainPLValue_79.mat',
+        'obtainPLValue_81.mat',
+        'obtainPLValue_83.mat',
+        'obtainPLValue_85.mat',
+        'obtainPLValue_87.mat',
+        'obtainPLValue_95.mat','obtainPLValue_197.mat', # 1,4,5,6,7,9
+        'obtainPLValue_125.mat', #1,4,5,7,9
+        'obtainPLValue_97.mat'# 1,4,5,7,9
     ]
-
-    # Load PLV data and labels
-    data, labels, subjects, file_names_list = load_eeg_data_mat(data_dir, file_names, friend_ids)
-    #data = [torch.tensor(d, dtype=torch.float32) for d in data]
+    file_names4 = [
+        'obtainPLValue_101.mat',
+        'obtainPLValue_103.mat',
+        'obtainPLValue_105.mat',
+        'obtainPLValue_107.mat',
+        'obtainPLValue_109.mat',
+        'obtainPLValue_115.mat',
+        'obtainPLValue_117.mat',
+        'obtainPLValue_119.mat',
+        'obtainPLValue_121.mat',
+        'obtainPLValue_123.mat',
+        'obtainPLValue_127.mat',
+        'obtainPLValue_129.mat',
+        'obtainPLValue_131.mat',
+        'obtainPLValue_133.mat',
+        'obtainPLValue_135.mat',
+        'obtainPLValue_137.mat',
+        'obtainPLValue_139.mat',
+        'obtainPLValue_141.mat',
+        'obtainPLValue_143.mat',
+        'obtainPLValue_145.mat',
+        'obtainPLValue_147.mat',
+        'obtainPLValue_149.mat',
+        'obtainPLValue_151.mat',
+        'obtainPLValue_153.mat',
+        'obtainPLValue_155.mat',
+        'obtainPLValue_157.mat',
+        'obtainPLValue_159.mat',
+        'obtainPLValue_161.mat',
+        'obtainPLValue_163.mat',
+        'obtainPLValue_165.mat',
+        'obtainPLValue_167.mat',
+        'obtainPLValue_169.mat',
+        'obtainPLValue_171.mat',
+        'obtainPLValue_175.mat',
+        'obtainPLValue_177.mat',
+        'obtainPLValue_179.mat',
+        'obtainPLValue_181.mat',
+        'obtainPLValue_183.mat',
+        'obtainPLValue_185.mat',
+        'obtainPLValue_187.mat',
+        'obtainPLValue_189.mat',
+        'obtainPLValue_191.mat',
+        'obtainPLValue_193.mat',
+        'obtainPLValue_195.mat',
+        'obtainPLValue_199.mat',
+        'obtainPLValue_201.mat',
+        'obtainPLValue_203.mat',
+        'obtainPLValue_23.mat',
+        'obtainPLValue_25.mat',
+        'obtainPLValue_27.mat',
+        'obtainPLValue_29.mat',
+        'obtainPLValue_35.mat',
+        'obtainPLValue_37.mat',
+        'obtainPLValue_41.mat',
+        'obtainPLValue_43.mat',
+        'obtainPLValue_47.mat',
+        'obtainPLValue_49.mat',
+        'obtainPLValue_51.mat',
+        'obtainPLValue_55.mat',
+        'obtainPLValue_57.mat',
+        'obtainPLValue_59.mat',
+        'obtainPLValue_61.mat',
+        'obtainPLValue_63.mat',
+        'obtainPLValue_65.mat',
+        'obtainPLValue_67.mat',
+        'obtainPLValue_69.mat',
+        'obtainPLValue_71.mat',
+        'obtainPLValue_73.mat',
+        'obtainPLValue_77.mat',
+        'obtainPLValue_79.mat',
+        'obtainPLValue_81.mat',
+        'obtainPLValue_83.mat',
+        'obtainPLValue_85.mat',
+        'obtainPLValue_87.mat',
+        'obtainPLValue_95.mat','obtainPLValue_197.mat',  # 1,4,5,6,7,9
+        'obtainPLValue_125.mat',  # 1,4,5,7,9
+        'obtainPLValue_97.mat'
+    ]
+    file_names5 = [
+        'obtainPLValue_101.mat',
+        'obtainPLValue_103.mat',
+        'obtainPLValue_105.mat',
+        'obtainPLValue_107.mat',
+        'obtainPLValue_109.mat',
+        'obtainPLValue_113.mat',
+        'obtainPLValue_115.mat',
+        'obtainPLValue_117.mat',
+        'obtainPLValue_119.mat',
+        'obtainPLValue_121.mat',
+        'obtainPLValue_123.mat',
+        'obtainPLValue_127.mat',
+        'obtainPLValue_129.mat',
+        'obtainPLValue_131.mat',
+        'obtainPLValue_133.mat',
+        'obtainPLValue_135.mat',
+        'obtainPLValue_137.mat',
+        'obtainPLValue_139.mat',
+        'obtainPLValue_141.mat',
+        'obtainPLValue_143.mat',
+        'obtainPLValue_145.mat',
+        'obtainPLValue_147.mat',
+        'obtainPLValue_149.mat',
+        'obtainPLValue_151.mat',
+        'obtainPLValue_153.mat',
+        'obtainPLValue_155.mat',
+        'obtainPLValue_157.mat',
+        'obtainPLValue_159.mat',
+        'obtainPLValue_161.mat',
+        'obtainPLValue_163.mat',
+        'obtainPLValue_165.mat',
+        'obtainPLValue_167.mat',
+        'obtainPLValue_169.mat',
+        'obtainPLValue_171.mat',
+        'obtainPLValue_175.mat',
+        'obtainPLValue_177.mat',
+        'obtainPLValue_179.mat',
+        'obtainPLValue_181.mat',
+        'obtainPLValue_183.mat',
+        'obtainPLValue_185.mat',
+        'obtainPLValue_187.mat',
+        'obtainPLValue_189.mat',
+        'obtainPLValue_191.mat',
+        'obtainPLValue_193.mat',
+        'obtainPLValue_195.mat',
+        'obtainPLValue_199.mat',
+        'obtainPLValue_201.mat',
+        'obtainPLValue_203.mat',
+        'obtainPLValue_23.mat',
+        'obtainPLValue_25.mat',
+        'obtainPLValue_27.mat',
+        'obtainPLValue_35.mat',
+        'obtainPLValue_37.mat',
+        'obtainPLValue_41.mat',
+        'obtainPLValue_43.mat',
+        'obtainPLValue_47.mat',
+        'obtainPLValue_49.mat',
+        'obtainPLValue_51.mat',
+        'obtainPLValue_53.mat',
+        'obtainPLValue_55.mat',
+        'obtainPLValue_57.mat',
+        'obtainPLValue_59.mat',
+        'obtainPLValue_61.mat',
+        'obtainPLValue_63.mat',
+        'obtainPLValue_65.mat',
+        'obtainPLValue_67.mat',
+        'obtainPLValue_69.mat',
+        'obtainPLValue_71.mat',
+        'obtainPLValue_73.mat',
+        'obtainPLValue_75.mat',
+        'obtainPLValue_77.mat',
+        'obtainPLValue_79.mat',
+        'obtainPLValue_81.mat',
+        'obtainPLValue_83.mat',
+        'obtainPLValue_85.mat',
+        'obtainPLValue_87.mat',
+        'obtainPLValue_95.mat','obtainPLValue_197.mat',  # 1,4,5,6,7,9
+        'obtainPLValue_125.mat',  # 1,4,5,7,9
+        'obtainPLValue_97.mat',  # 1,4,5,7,9
+        'obtainPLValue_111.mat',  # 6,5,7,9
+        'obtainPLValue_39.mat',  # 7,9,6,5
+        'obtainPLValue_99.mat',  # 5,6,7,9
+        'obtainPLValue_33.mat'  # 9,7,6,5,4
+    ]
+    file_names6 = ['obtainPLValue_101.mat',
+'obtainPLValue_103.mat',
+'obtainPLValue_105.mat',
+'obtainPLValue_107.mat',
+'obtainPLValue_109.mat',
+'obtainPLValue_113.mat',
+'obtainPLValue_115.mat',
+'obtainPLValue_117.mat',
+'obtainPLValue_119.mat',
+'obtainPLValue_121.mat',
+'obtainPLValue_123.mat',
+'obtainPLValue_127.mat',
+'obtainPLValue_129.mat',
+'obtainPLValue_131.mat',
+'obtainPLValue_133.mat',
+'obtainPLValue_135.mat',
+'obtainPLValue_137.mat',
+'obtainPLValue_139.mat',
+'obtainPLValue_141.mat',
+'obtainPLValue_143.mat',
+'obtainPLValue_145.mat',
+'obtainPLValue_147.mat',
+'obtainPLValue_149.mat',
+'obtainPLValue_151.mat',
+'obtainPLValue_153.mat',
+'obtainPLValue_155.mat',
+'obtainPLValue_157.mat',
+'obtainPLValue_159.mat',
+'obtainPLValue_163.mat',
+'obtainPLValue_165.mat',
+'obtainPLValue_167.mat',
+'obtainPLValue_169.mat',
+'obtainPLValue_171.mat',
+'obtainPLValue_175.mat',
+'obtainPLValue_177.mat',
+'obtainPLValue_179.mat',
+'obtainPLValue_181.mat',
+'obtainPLValue_183.mat',
+'obtainPLValue_185.mat',
+'obtainPLValue_187.mat',
+'obtainPLValue_189.mat',
+'obtainPLValue_191.mat',
+'obtainPLValue_193.mat',
+'obtainPLValue_195.mat',
+'obtainPLValue_199.mat',
+'obtainPLValue_201.mat',
+'obtainPLValue_203.mat',
+'obtainPLValue_23.mat',
+'obtainPLValue_25.mat',
+'obtainPLValue_27.mat',
+'obtainPLValue_29.mat',
+'obtainPLValue_35.mat',
+'obtainPLValue_37.mat',
+'obtainPLValue_41.mat',
+'obtainPLValue_43.mat',
+'obtainPLValue_47.mat',
+'obtainPLValue_49.mat',
+'obtainPLValue_51.mat',
+'obtainPLValue_53.mat',
+'obtainPLValue_55.mat',
+'obtainPLValue_57.mat',
+'obtainPLValue_59.mat',
+'obtainPLValue_61.mat',
+'obtainPLValue_63.mat',
+'obtainPLValue_65.mat',
+'obtainPLValue_67.mat',
+'obtainPLValue_69.mat',
+'obtainPLValue_71.mat',
+'obtainPLValue_73.mat',
+'obtainPLValue_75.mat',
+'obtainPLValue_77.mat',
+'obtainPLValue_79.mat',
+'obtainPLValue_81.mat',
+'obtainPLValue_83.mat',
+'obtainPLValue_85.mat',
+'obtainPLValue_87.mat',
+'obtainPLValue_95.mat','obtainPLValue_197.mat', # 1,4,5,6,7,9
+        'obtainPLValue_125.mat', #1,4,5,7,9
+        'obtainPLValue_97.mat',# 1,4,5,7,9
+        'obtainPLValue_111.mat', #6,5,7,9
+        'obtainPLValue_39.mat', #7,9,6,5
+        'obtainPLValue_99.mat',#5,6,7,9
+        'obtainPLValue_33.mat',#9,7,6,5,4
+        'obtainPLValue_31.mat', #6
+]
+    file_names7 = [
+        'obtainPLValue_101.mat',
+        'obtainPLValue_103.mat',
+        'obtainPLValue_105.mat',
+        'obtainPLValue_107.mat',
+        'obtainPLValue_109.mat',
+        'obtainPLValue_113.mat',
+        'obtainPLValue_115.mat',
+        'obtainPLValue_117.mat',
+        'obtainPLValue_119.mat',
+        'obtainPLValue_121.mat',
+        'obtainPLValue_123.mat',
+        'obtainPLValue_127.mat',
+        'obtainPLValue_129.mat',
+        'obtainPLValue_131.mat',
+        'obtainPLValue_133.mat',
+        'obtainPLValue_135.mat',
+        'obtainPLValue_137.mat',
+        'obtainPLValue_139.mat',
+        'obtainPLValue_141.mat',
+        'obtainPLValue_143.mat',
+        'obtainPLValue_145.mat',
+        'obtainPLValue_147.mat',
+        'obtainPLValue_149.mat',
+        'obtainPLValue_151.mat',
+        'obtainPLValue_153.mat',
+        'obtainPLValue_155.mat',
+        'obtainPLValue_157.mat',
+        'obtainPLValue_159.mat',
+        'obtainPLValue_161.mat',
+        'obtainPLValue_163.mat',
+        'obtainPLValue_165.mat',
+        'obtainPLValue_167.mat',
+        'obtainPLValue_169.mat',
+        'obtainPLValue_171.mat',
+        'obtainPLValue_175.mat',
+        'obtainPLValue_177.mat',
+        'obtainPLValue_179.mat',
+        'obtainPLValue_181.mat',
+        'obtainPLValue_183.mat',
+        'obtainPLValue_185.mat',
+        'obtainPLValue_187.mat',
+        'obtainPLValue_189.mat',
+        'obtainPLValue_191.mat',
+        'obtainPLValue_193.mat',
+        'obtainPLValue_195.mat',
+        'obtainPLValue_199.mat',
+        'obtainPLValue_201.mat',
+        'obtainPLValue_203.mat',
+        'obtainPLValue_23.mat',
+        'obtainPLValue_25.mat',
+        'obtainPLValue_27.mat',
+        'obtainPLValue_35.mat',
+        'obtainPLValue_37.mat',
+        'obtainPLValue_41.mat',
+        'obtainPLValue_43.mat',
+        'obtainPLValue_47.mat',
+        'obtainPLValue_49.mat',
+        'obtainPLValue_51.mat',
+        'obtainPLValue_53.mat',
+        'obtainPLValue_55.mat',
+        'obtainPLValue_57.mat',
+        'obtainPLValue_59.mat',
+        'obtainPLValue_61.mat',
+        'obtainPLValue_63.mat',
+        'obtainPLValue_65.mat',
+        'obtainPLValue_67.mat',
+        'obtainPLValue_69.mat',
+        'obtainPLValue_71.mat',
+        'obtainPLValue_73.mat',
+        'obtainPLValue_75.mat',
+        'obtainPLValue_77.mat',
+        'obtainPLValue_79.mat',
+        'obtainPLValue_81.mat',
+        'obtainPLValue_83.mat',
+        'obtainPLValue_85.mat',
+        'obtainPLValue_87.mat',
+        'obtainPLValue_95.mat','obtainPLValue_197.mat',  # 1,4,5,6,7,9
+        'obtainPLValue_125.mat',  # 1,4,5,7,9
+        'obtainPLValue_97.mat',  # 1,4,5,7,9
+        'obtainPLValue_111.mat',  # 6,5,7,9
+        'obtainPLValue_39.mat',  # 7,9,6,5
+        'obtainPLValue_99.mat',  # 5,6,7,9
+        'obtainPLValue_33.mat'  # 9,7,6,5,4
+    ]
+    file_names9 = [
+        'obtainPLValue_101.mat',
+        'obtainPLValue_103.mat',
+        'obtainPLValue_105.mat',
+        'obtainPLValue_107.mat',
+        'obtainPLValue_109.mat',
+        'obtainPLValue_113.mat',
+        'obtainPLValue_115.mat',
+        'obtainPLValue_117.mat',
+        'obtainPLValue_119.mat',
+        'obtainPLValue_121.mat',
+        'obtainPLValue_123.mat',
+        'obtainPLValue_127.mat',
+        'obtainPLValue_129.mat',
+        'obtainPLValue_131.mat',
+        'obtainPLValue_133.mat',
+        'obtainPLValue_135.mat',
+        'obtainPLValue_137.mat',
+        'obtainPLValue_139.mat',
+        'obtainPLValue_141.mat',
+        'obtainPLValue_143.mat',
+        'obtainPLValue_145.mat',
+        'obtainPLValue_147.mat',
+        'obtainPLValue_149.mat',
+        'obtainPLValue_151.mat',
+        'obtainPLValue_153.mat',
+        'obtainPLValue_155.mat',
+        'obtainPLValue_157.mat',
+        'obtainPLValue_159.mat',
+        'obtainPLValue_161.mat',
+        'obtainPLValue_163.mat',
+        'obtainPLValue_165.mat',
+        'obtainPLValue_167.mat',
+        'obtainPLValue_169.mat',
+        'obtainPLValue_171.mat',
+        'obtainPLValue_175.mat',
+        'obtainPLValue_177.mat',
+        'obtainPLValue_179.mat',
+        'obtainPLValue_181.mat',
+        'obtainPLValue_183.mat',
+        'obtainPLValue_185.mat',
+        'obtainPLValue_187.mat',
+        'obtainPLValue_189.mat',
+        'obtainPLValue_191.mat',
+        'obtainPLValue_193.mat',
+        'obtainPLValue_195.mat',
+        'obtainPLValue_199.mat',
+        'obtainPLValue_201.mat',
+        'obtainPLValue_203.mat',
+        'obtainPLValue_23.mat',
+        'obtainPLValue_25.mat',
+        'obtainPLValue_27.mat',
+        'obtainPLValue_29.mat',
+        'obtainPLValue_35.mat',
+        'obtainPLValue_37.mat',
+        'obtainPLValue_41.mat',
+        'obtainPLValue_43.mat',
+        'obtainPLValue_47.mat',
+        'obtainPLValue_49.mat',
+        'obtainPLValue_51.mat',
+        'obtainPLValue_55.mat',
+        'obtainPLValue_57.mat',
+        'obtainPLValue_59.mat',
+        'obtainPLValue_61.mat',
+        'obtainPLValue_63.mat',
+        'obtainPLValue_65.mat',
+        'obtainPLValue_67.mat',
+        'obtainPLValue_69.mat',
+        'obtainPLValue_71.mat',
+        'obtainPLValue_73.mat',
+        'obtainPLValue_75.mat',
+        'obtainPLValue_77.mat',
+        'obtainPLValue_79.mat',
+        'obtainPLValue_81.mat',
+        'obtainPLValue_83.mat',
+        'obtainPLValue_85.mat',
+        'obtainPLValue_87.mat',
+        'obtainPLValue_95.mat','obtainPLValue_197.mat',  # 1,4,5,6,7,9
+        'obtainPLValue_125.mat',  # 1,4,5,7,9
+        'obtainPLValue_97.mat',  # 1,4,5,7,9
+        'obtainPLValue_111.mat',  # 6,5,7,9
+        'obtainPLValue_39.mat',  # 7,9,6,5
+        'obtainPLValue_99.mat',  # 5,6,7,9
+        'obtainPLValue_33.mat'
+    ]
+    data1, labels1, subjects1, file_names_list1 = load_eeg_data_mat(data_dir1, file_names, friend_ids)
+    data4, labels4, subjects4, file_names_list4 = load_eeg_data_mat(data_dir4, file_names4, friend_ids)
+    data5, labels5, subjects5, file_names_list5 = load_eeg_data_mat(data_dir5, file_names5, friend_ids)
+    data6, labels6, subjects6, file_names_list6 = load_eeg_data_mat(data_dir6, file_names6, friend_ids)
+    data7, labels7, subjects7, file_names_list7 = load_eeg_data_mat(data_dir7, file_names7, friend_ids)
+    data9, labels9, subjects9, file_names_list9 = load_eeg_data_mat(data_dir9, file_names9, friend_ids)
+    data = data1 + data4 + data5 + data6 + data7 + data9
+    labels = np.concatenate([labels1, labels4, labels5, labels6, labels7, labels9])
+    subjects = subjects1 + subjects4 + subjects5 + subjects6 + subjects7 + subjects9
+    file_names_list = file_names_list1 + file_names_list4 + file_names_list5 + file_names_list6 + file_names_list7 + file_names_list9
     data = [d.astype(np.float32) if not isinstance(d, np.ndarray) else d for d in data]
     labels = np.array(labels, dtype=np.int64)
-
-    # Verify that lengths match
     assert len(data) == len(labels), "Mismatch in lengths of data and labels"
-
-    # Print data information
     for i, plv_data in enumerate(data):
         file_name = file_names_list[i]
         label = labels[i]
         print(
             f"Subject {file_name}: PLV data shape = {plv_data.shape}, Label = {'Friend' if label == 1 else 'Stranger'}")
-
     # Create pairs and triplets
     pairs, pair_labels, triplets = create_pairs_and_triplets(data, labels)
     Fs = 256  # Example sampling frequency
     LowBand = 4  # original 13 but now 4 frequency so adjusted to 4.
     HighBand = 45  # band upper edge
-
     # Create dataset and dataloader
     dataset = EEGDataset(pairs, pair_labels, triplets, Fs, LowBand, HighBand)
-    batch_size = 76  # Adjust based on your data size
+    batch_size = 79  # Adjust based on your data size
     train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-
     # Initialize the model
     num_frequency_bands = 4
     num_channels = data[0].shape[1]
@@ -630,7 +1127,6 @@ if __name__ == '__main__':
     num_plv_features = 0
     num_isc_features = num_channels
     time_len = num_channels  # Since PLV matrices are square (channels x channels)
-
     # Adjust DSENModel to accept PLV data
     model = DSENModel(
         num_channels=num_channels,
@@ -638,21 +1134,16 @@ if __name__ == '__main__':
         num_features=num_features,
         num_classes=2,
     ).to(device)
-
     # Define loss functions
     criterion_classification = nn.CrossEntropyLoss()
     criterion_triplet = TripletLoss(margin=1.0)
     criterion_cca = CCALoss()
-
     # Define learning rate
     learning_rate = 1e-4
-
     # Initialize separate optimizers
     optimizer_f = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate)
     optimizer_c = torch.optim.Adam(model.classifier.parameters(), lr=learning_rate)
-
     num_epochs = 100
-
     # Training loop
     for epoch in range(num_epochs):
         avg_loss_combined, avg_loss_triplet, f1 = train_model(
@@ -668,6 +1159,7 @@ if __name__ == '__main__':
         print(f'Epoch [{epoch+1}/{num_epochs}], Combined Loss: {avg_loss_combined:.4f}, '
               f'Triplet Loss: {avg_loss_triplet:.4f}, F1 Score: {f1:.4f}')
     print('Training complete.')
+
     # Model saving
     torch.save(model.state_dict(), 'model_dsen.pth')
     torch.save(optimizer_f.state_dict(), 'optimizer_f.pth')

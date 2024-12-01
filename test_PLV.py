@@ -18,7 +18,7 @@ friend_ids = [
     143, 144, 153, 154, 159, 160, 161, 162, 179, 180, 42, 55, 56, 61, 62, 63,
     64, 65, 66, 71, 72, 87, 88, 89, 90, 91, 92, 93, 94, 99, 100, 109, 110, 113,
     114, 115, 116, 121, 122, 127, 128, 129, 130, 133, 134, 135, 136, 139, 140,
-    141, 142, 145, 146, 147, 148, 149, 150151, 152, 155, 156, 157, 158, 163,
+    141, 142, 145, 146, 147, 148, 149, 150, 151, 152, 155, 156, 157, 158, 163,
     164, 165, 166, 167, 168, 169, 170, 175, 176, 177, 178, 189, 190, 199, 200,
     201, 202, 203, 204, 205, 206
 ]
@@ -228,17 +228,89 @@ if __name__ == '__main__':
         exit()
 
     model.eval()
-
+    data_dir6 = '/home/derrick/PycharmProjects/datayx/hyperemotion6/subB'
+    file_names6 = [
+        'obtainPLValue_197.mat',  # 1,4,5,6,7,9
+        'obtainPLValue_125.mat',  # 1,4,5,7,9
+        'obtainPLValue_97.mat'  # 1,4,5,7,9
+        'obtainPLValue_111.mat',  # 6,5,7,9
+        'obtainPLValue_39.mat',  # 7,9,6,5
+        'obtainPLValue_99.mat',  # 5,6,7,9
+        'obtainPLValue_33.mat',  # 9,7,6,5,4
+        'obtainPLValue_31.mat',  # 6
+    ]
+    data6, labels6, subjects6, file_names_list6 = load_eeg_data_mat(data_dir6, file_names6, friend_ids)
+    data = data6
+    labels = labels6
+    subject_ids = subjects6
+    file_names_list = file_names_list6
+    """
     # Load and preprocess test data
-    data_dir = '/home/derrick/PycharmProjects/datayx/hyperemotion9/subB'  # Update with your test data directory
-    test_files = [
-        'obtainPLValue_101.mat',  'obtainPLValue_137.mat',   'obtainPLValue_175.mat',   'obtainPLValue_29.mat',
-        'obtainPLValue_71.mat',
-        'obtainPLValue_103.mat',   'obtainPLValue_139.mat',   'obtainPLValue_177.mat',   'obtainPLValue_33.mat',
-        'obtainPLValue_73.mat'
-    ]  # Update with your test file names
-    data, labels, subject_ids, file_names_list = load_eeg_data_mat(data_dir, test_files, friend_ids)
+    data_dir1 = '/home/derrick/PycharmProjects/datayx/hyperemotion1/subB'
+    data_dir4 = '/home/derrick/PycharmProjects/datayx/hyperemotion4/subB'
+    data_dir5 = '/home/derrick/PycharmProjects/datayx/hyperemotion5/subB'
+    data_dir6 = '/home/derrick/PycharmProjects/datayx/hyperemotion6/subB'
+    data_dir7 = '/home/derrick/PycharmProjects/datayx/hyperemotion7/subB'
+    data_dir9 = '/home/derrick/PycharmProjects/datayx/hyperemotion9/subB'
+    file_names1 = [
+        'obtainPLValue_197.mat', # 1,4,5,6,7,9
+        'obtainPLValue_125.mat', #1,4,5,7,9
+        'obtainPLValue_97.mat'# 1,4,5,7,9
+    ]
+    file_names4 = [
+        'obtainPLValue_197.mat',  # 1,4,5,6,7,9
+        'obtainPLValue_125.mat',  # 1,4,5,7,9
+        'obtainPLValue_97.mat'  # 1,4,5,7,9
+    ]
+    file_names5 = [
+        'obtainPLValue_197.mat',  # 1,4,5,6,7,9
+        'obtainPLValue_125.mat',  # 1,4,5,7,9
+        'obtainPLValue_97.mat',  # 1,4,5,7,9
+        'obtainPLValue_111.mat',  # 6,5,7,9
+        'obtainPLValue_39.mat',  # 7,9,6,5
+        'obtainPLValue_99.mat',  # 5,6,7,9
+        'obtainPLValue_33.mat'  # 9,7,6,5,4
+    ]
+    file_names6 = [
+        'obtainPLValue_197.mat', # 1,4,5,6,7,9
+        'obtainPLValue_125.mat', #1,4,5,7,9
+        'obtainPLValue_97.mat'# 1,4,5,7,9
+        'obtainPLValue_111.mat', #6,5,7,9
+        'obtainPLValue_39.mat', #7,9,6,5
+        'obtainPLValue_99.mat',#5,6,7,9
+        'obtainPLValue_33.mat',#9,7,6,5,4
+        'obtainPLValue_31.mat', #6
+    ]
+    file_names7 = [
+        'obtainPLValue_197.mat',  # 1,4,5,6,7,9
+        'obtainPLValue_125.mat',  # 1,4,5,7,9
+        'obtainPLValue_97.mat',  # 1,4,5,7,9
+        'obtainPLValue_111.mat',  # 6,5,7,9
+        'obtainPLValue_39.mat',  # 7,9,6,5
+        'obtainPLValue_99.mat',  # 5,6,7,9
+        'obtainPLValue_33.mat'  # 9,7,6,5,4
+    ]
+    file_names9 = [
+        'obtainPLValue_197.mat',  # 1,4,5,6,7,9
+        'obtainPLValue_125.mat',  # 1,4,5,7,9
+        'obtainPLValue_97.mat',  # 1,4,5,7,9
+        'obtainPLValue_111.mat',  # 6,5,7,9
+        'obtainPLValue_39.mat',  # 7,9,6,5
+        'obtainPLValue_99.mat',  # 5,6,7,9
+        'obtainPLValue_33.mat'  # 9,7,6,5,4
+    ]
 
+    data1, labels1, subjects1, file_names_list1 = load_eeg_data_mat(data_dir1, file_names1, friend_ids)
+    data4, labels4, subjects4, file_names_list4 = load_eeg_data_mat(data_dir4, file_names4, friend_ids)
+    data5, labels5, subjects5, file_names_list5 = load_eeg_data_mat(data_dir5, file_names5, friend_ids)
+    data6, labels6, subjects6, file_names_list6 = load_eeg_data_mat(data_dir6, file_names6, friend_ids)
+    data7, labels7, subjects7, file_names_list7 = load_eeg_data_mat(data_dir7, file_names7, friend_ids)
+    data9, labels9, subjects9, file_names_list9 = load_eeg_data_mat(data_dir9, file_names9, friend_ids)
+    data = data1 + data4 + data5 + data6 + data7 + data9
+    labels = np.concatenate([labels1, labels4, labels5, labels6, labels7, labels9])
+    subject_ids = subjects1 + subjects4 + subjects5 + subjects6 + subjects7 + subjects9
+    file_names_list = file_names_list1 + file_names_list4 + file_names_list5 + file_names_list6 + file_names_list7 + file_names_list9
+    """
     # Check if data was loaded
     if not data:
         print("No data was loaded. Exiting.")
