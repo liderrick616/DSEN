@@ -12,6 +12,7 @@ from sklearn.metrics import f1_score
 from scipy.signal import firwin, filtfilt
 import random
 from scipy.signal import resample
+from collections import Counter
 
 
 # Slide 7
@@ -415,10 +416,7 @@ def load_eeg_data_mat(data_dir, file_names, friend_ids):
             print(f"Not all frequency bands found for {file_name}. Skipping.")
 
     return data, labels, subjects, file_names_list
-
-
-
-
+"""
 def create_pairs_and_triplets(data, labels, num_pairs=1000, num_triplets=1000):
     pairs = []
     pair_labels = []
@@ -438,6 +436,59 @@ def create_pairs_and_triplets(data, labels, num_pairs=1000, num_triplets=1000):
     if not labels_with_enough_samples:
         print("Not enough samples to create pairs and triplets.")
         return pairs, pair_labels, triplets
+
+    # Generate positive and negative pairs
+    for _ in range(num_pairs // 2):
+        # Positive pair (same label)
+        label = random.choice(labels_with_enough_samples)
+        idx1, idx2 = random.sample(label_to_indices[label], 2)
+        pairs.append((data[idx1], data[idx2]))
+        pair_labels.append(1)
+
+        # Negative pair (different labels)
+        label1, label2 = random.sample(labels_with_enough_samples, 2)
+        idx1 = random.choice(label_to_indices[label1])
+        idx2 = random.choice(label_to_indices[label2])
+        pairs.append((data[idx1], data[idx2]))
+        pair_labels.append(0)
+
+    # Generate triplets
+    for _ in range(num_triplets):
+        # Anchor and positive (same label)
+        label = random.choice(labels_with_enough_samples)
+        idxs = label_to_indices[label]
+        if len(idxs) >= 2:
+            anchor_idx, positive_idx = random.sample(idxs, 2)
+            # Negative (different label)
+            negative_label = random.choice([l for l in labels_with_enough_samples if l != label])
+            negative_idx = random.choice(label_to_indices[negative_label])
+            triplets.append((data[anchor_idx], data[positive_idx], data[negative_idx]))
+
+    return pairs, pair_labels, triplets
+"""
+def create_pairs_and_triplets(data, labels):
+    pairs = []
+    pair_labels = []
+    triplets = []
+
+    # Convert labels to integers if they are tensors
+    if isinstance(labels[0], torch.Tensor):
+        labels = [label.item() for label in labels]
+
+    # Group data indices by label
+    label_to_indices = {}
+    for idx, label in enumerate(labels):
+        label_to_indices.setdefault(label, []).append(idx)
+
+    # Remove labels that have less than 2 samples
+    labels_with_enough_samples = [label for label in label_to_indices if len(label_to_indices[label]) >= 2]
+    if not labels_with_enough_samples:
+        print("Not enough samples to create pairs and triplets.")
+        return pairs, pair_labels, triplets
+
+    # Calculate the number of pairs and triplets based on data size
+    num_pairs = min(1000, len(labels) * 10)  # For example, 10 times the number of samples
+    num_triplets = min(1000, len(labels) * 5)  # For example, 5 times the number of samples
 
     # Generate positive and negative pairs
     for _ in range(num_pairs // 2):
@@ -585,65 +636,31 @@ if __name__ == '__main__':
     data_dir7 = '/home/derrick/PycharmProjects/datayx/hyperemotion7/subB'
     data_dir9 = '/home/derrick/PycharmProjects/datayx/hyperemotion9/subB'
 
-    friend_ids = [11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44,45,46,
-     47,48,49,50,51,52,53,54,57,58,59,60,67,68,69,70,73,74,75,77,78,79,80,81,82,83,84,85,86,105,106,107,108,111,112,
-     131,132,137,138,143,144,153,154,159,160,161,162,179,180,42,55,56,61,62,63,64,65,66,71,72,87,88,89,90,91,92,93,94,
-                  99,100,109,110,113,114,115,116,121,122,127,128,129,130,133,134,135,136,139,140,141,142,145,146,147,
-                  148,149,150,151,152,155,156,157,158,163,164,165,166,167,168,169,170,175,176,177,178,189,190,199,200,
-                  201,202,203,204,205,206]
+    friend_ids = [23,25,27,35,37,47,49,51,57,59,67,69,73,77,79,81,83,85,105,107,
+     131,137,143,153,159,41,61,63,65,71,87,109,115,121,127,129,133,135,139,141,147,149,151,155,157,163,165,167,175,177,
+                  189,199,201,203,43]
+    strangers_ids = [95,97,101,103,117,119,123,125,171,181,183,185,187,191,193,195,197]
+
     file_names = [
-        'obtainPLValue_101.mat',
         'obtainPLValue_103.mat',
-        'obtainPLValue_105.mat',
-        'obtainPLValue_107.mat',
-        'obtainPLValue_109.mat',
-        'obtainPLValue_113.mat',
-        'obtainPLValue_115.mat',
         'obtainPLValue_117.mat',
         'obtainPLValue_119.mat',
-        'obtainPLValue_121.mat',
         'obtainPLValue_123.mat',
-        'obtainPLValue_127.mat',
-        'obtainPLValue_129.mat',
-        'obtainPLValue_131.mat',
-        'obtainPLValue_133.mat',
-        'obtainPLValue_135.mat',
-        'obtainPLValue_137.mat',
-        'obtainPLValue_139.mat',
-        'obtainPLValue_141.mat',
-        'obtainPLValue_143.mat',
-        'obtainPLValue_145.mat',
-        'obtainPLValue_147.mat',
-        'obtainPLValue_149.mat',
-        'obtainPLValue_151.mat',
-        'obtainPLValue_153.mat',
-        'obtainPLValue_155.mat',
-        'obtainPLValue_157.mat',
-        'obtainPLValue_159.mat',
-        'obtainPLValue_161.mat',
-        'obtainPLValue_163.mat',
-        'obtainPLValue_165.mat',
-        'obtainPLValue_167.mat',
-        'obtainPLValue_169.mat',
+        'obtainPLValue_125.mat',
         'obtainPLValue_171.mat',
-        'obtainPLValue_175.mat',
-        'obtainPLValue_177.mat',
-        'obtainPLValue_179.mat',
         'obtainPLValue_181.mat',
         'obtainPLValue_183.mat',
         'obtainPLValue_185.mat',
         'obtainPLValue_187.mat',
-        'obtainPLValue_189.mat',
         'obtainPLValue_191.mat',
         'obtainPLValue_193.mat',
         'obtainPLValue_195.mat',
-        'obtainPLValue_199.mat',
-        'obtainPLValue_201.mat',
-        'obtainPLValue_203.mat',
+        'obtainPLValue_197.mat',
+        # above is stranger
         'obtainPLValue_23.mat',
         'obtainPLValue_25.mat',
         'obtainPLValue_27.mat',
-        'obtainPLValue_29.mat',
+        # 'obtainPLValue_29.mat',
         'obtainPLValue_35.mat',
         'obtainPLValue_37.mat',
         'obtainPLValue_41.mat',
@@ -651,80 +668,35 @@ if __name__ == '__main__':
         'obtainPLValue_47.mat',
         'obtainPLValue_49.mat',
         'obtainPLValue_51.mat',
-        'obtainPLValue_53.mat',
-        'obtainPLValue_55.mat',
+        # 'obtainPLValue_53.mat',
+        # 'obtainPLValue_55.mat',
         'obtainPLValue_57.mat',
         'obtainPLValue_59.mat',
         'obtainPLValue_61.mat',
-        'obtainPLValue_63.mat',
-        'obtainPLValue_65.mat',
-        'obtainPLValue_67.mat',
-        'obtainPLValue_69.mat',
-        'obtainPLValue_71.mat',
-        'obtainPLValue_73.mat',
-        'obtainPLValue_75.mat',
-        'obtainPLValue_77.mat',
-        'obtainPLValue_79.mat',
-        'obtainPLValue_81.mat',
-        'obtainPLValue_83.mat',
-        'obtainPLValue_85.mat',
-        'obtainPLValue_87.mat',
-        'obtainPLValue_95.mat','obtainPLValue_197.mat', # 1,4,5,6,7,9
-        'obtainPLValue_125.mat', #1,4,5,7,9
-        'obtainPLValue_97.mat'# 1,4,5,7,9
+        'obtainPLValue_63.mat'
+        # above is friends/couples
+
     ]
     file_names4 = [
-        'obtainPLValue_101.mat',
         'obtainPLValue_103.mat',
-        'obtainPLValue_105.mat',
-        'obtainPLValue_107.mat',
-        'obtainPLValue_109.mat',
-        'obtainPLValue_115.mat',
         'obtainPLValue_117.mat',
         'obtainPLValue_119.mat',
-        'obtainPLValue_121.mat',
         'obtainPLValue_123.mat',
-        'obtainPLValue_127.mat',
-        'obtainPLValue_129.mat',
-        'obtainPLValue_131.mat',
-        'obtainPLValue_133.mat',
-        'obtainPLValue_135.mat',
-        'obtainPLValue_137.mat',
-        'obtainPLValue_139.mat',
-        'obtainPLValue_141.mat',
-        'obtainPLValue_143.mat',
-        'obtainPLValue_145.mat',
-        'obtainPLValue_147.mat',
-        'obtainPLValue_149.mat',
-        'obtainPLValue_151.mat',
-        'obtainPLValue_153.mat',
-        'obtainPLValue_155.mat',
-        'obtainPLValue_157.mat',
-        'obtainPLValue_159.mat',
-        'obtainPLValue_161.mat',
-        'obtainPLValue_163.mat',
-        'obtainPLValue_165.mat',
-        'obtainPLValue_167.mat',
-        'obtainPLValue_169.mat',
+        'obtainPLValue_125.mat',
         'obtainPLValue_171.mat',
-        'obtainPLValue_175.mat',
-        'obtainPLValue_177.mat',
-        'obtainPLValue_179.mat',
         'obtainPLValue_181.mat',
         'obtainPLValue_183.mat',
         'obtainPLValue_185.mat',
         'obtainPLValue_187.mat',
-        'obtainPLValue_189.mat',
         'obtainPLValue_191.mat',
         'obtainPLValue_193.mat',
         'obtainPLValue_195.mat',
-        'obtainPLValue_199.mat',
-        'obtainPLValue_201.mat',
-        'obtainPLValue_203.mat',
+        'obtainPLValue_197.mat',
+        # above is stranger
         'obtainPLValue_23.mat',
         'obtainPLValue_25.mat',
         'obtainPLValue_27.mat',
-        'obtainPLValue_29.mat',
+        # 'obtainPLValue_29.mat',
         'obtainPLValue_35.mat',
         'obtainPLValue_37.mat',
         'obtainPLValue_41.mat',
@@ -732,78 +704,34 @@ if __name__ == '__main__':
         'obtainPLValue_47.mat',
         'obtainPLValue_49.mat',
         'obtainPLValue_51.mat',
-        'obtainPLValue_55.mat',
+        # 'obtainPLValue_53.mat',
+        # 'obtainPLValue_55.mat',
         'obtainPLValue_57.mat',
         'obtainPLValue_59.mat',
         'obtainPLValue_61.mat',
-        'obtainPLValue_63.mat',
-        'obtainPLValue_65.mat',
-        'obtainPLValue_67.mat',
-        'obtainPLValue_69.mat',
-        'obtainPLValue_71.mat',
-        'obtainPLValue_73.mat',
-        'obtainPLValue_77.mat',
-        'obtainPLValue_79.mat',
-        'obtainPLValue_81.mat',
-        'obtainPLValue_83.mat',
-        'obtainPLValue_85.mat',
-        'obtainPLValue_87.mat',
-        'obtainPLValue_95.mat','obtainPLValue_197.mat',  # 1,4,5,6,7,9
-        'obtainPLValue_125.mat',  # 1,4,5,7,9
-        'obtainPLValue_97.mat'
+        'obtainPLValue_63.mat'
+        # above is friends/couples
     ]
     file_names5 = [
-        'obtainPLValue_101.mat',
         'obtainPLValue_103.mat',
-        'obtainPLValue_105.mat',
-        'obtainPLValue_107.mat',
-        'obtainPLValue_109.mat',
-        'obtainPLValue_113.mat',
-        'obtainPLValue_115.mat',
         'obtainPLValue_117.mat',
         'obtainPLValue_119.mat',
-        'obtainPLValue_121.mat',
         'obtainPLValue_123.mat',
-        'obtainPLValue_127.mat',
-        'obtainPLValue_129.mat',
-        'obtainPLValue_131.mat',
-        'obtainPLValue_133.mat',
-        'obtainPLValue_135.mat',
-        'obtainPLValue_137.mat',
-        'obtainPLValue_139.mat',
-        'obtainPLValue_141.mat',
-        'obtainPLValue_143.mat',
-        'obtainPLValue_145.mat',
-        'obtainPLValue_147.mat',
-        'obtainPLValue_149.mat',
-        'obtainPLValue_151.mat',
-        'obtainPLValue_153.mat',
-        'obtainPLValue_155.mat',
-        'obtainPLValue_157.mat',
-        'obtainPLValue_159.mat',
-        'obtainPLValue_161.mat',
-        'obtainPLValue_163.mat',
-        'obtainPLValue_165.mat',
-        'obtainPLValue_167.mat',
-        'obtainPLValue_169.mat',
+        'obtainPLValue_125.mat',
         'obtainPLValue_171.mat',
-        'obtainPLValue_175.mat',
-        'obtainPLValue_177.mat',
-        'obtainPLValue_179.mat',
         'obtainPLValue_181.mat',
         'obtainPLValue_183.mat',
         'obtainPLValue_185.mat',
         'obtainPLValue_187.mat',
-        'obtainPLValue_189.mat',
         'obtainPLValue_191.mat',
         'obtainPLValue_193.mat',
         'obtainPLValue_195.mat',
-        'obtainPLValue_199.mat',
-        'obtainPLValue_201.mat',
-        'obtainPLValue_203.mat',
+        'obtainPLValue_197.mat',
+        # above is stranger
         'obtainPLValue_23.mat',
         'obtainPLValue_25.mat',
         'obtainPLValue_27.mat',
+        # 'obtainPLValue_29.mat',
         'obtainPLValue_35.mat',
         'obtainPLValue_37.mat',
         'obtainPLValue_41.mat',
@@ -811,169 +739,34 @@ if __name__ == '__main__':
         'obtainPLValue_47.mat',
         'obtainPLValue_49.mat',
         'obtainPLValue_51.mat',
-        'obtainPLValue_53.mat',
-        'obtainPLValue_55.mat',
+        # 'obtainPLValue_53.mat',
+        # 'obtainPLValue_55.mat',
         'obtainPLValue_57.mat',
         'obtainPLValue_59.mat',
         'obtainPLValue_61.mat',
-        'obtainPLValue_63.mat',
-        'obtainPLValue_65.mat',
-        'obtainPLValue_67.mat',
-        'obtainPLValue_69.mat',
-        'obtainPLValue_71.mat',
-        'obtainPLValue_73.mat',
-        'obtainPLValue_75.mat',
-        'obtainPLValue_77.mat',
-        'obtainPLValue_79.mat',
-        'obtainPLValue_81.mat',
-        'obtainPLValue_83.mat',
-        'obtainPLValue_85.mat',
-        'obtainPLValue_87.mat',
-        'obtainPLValue_95.mat','obtainPLValue_197.mat',  # 1,4,5,6,7,9
-        'obtainPLValue_125.mat',  # 1,4,5,7,9
-        'obtainPLValue_97.mat',  # 1,4,5,7,9
-        'obtainPLValue_111.mat',  # 6,5,7,9
-        'obtainPLValue_39.mat',  # 7,9,6,5
-        'obtainPLValue_99.mat',  # 5,6,7,9
-        'obtainPLValue_33.mat'  # 9,7,6,5,4
+        'obtainPLValue_63.mat'
+        # above is friends/couples
     ]
-    file_names6 = ['obtainPLValue_101.mat',
-'obtainPLValue_103.mat',
-'obtainPLValue_105.mat',
-'obtainPLValue_107.mat',
-'obtainPLValue_109.mat',
-'obtainPLValue_113.mat',
-'obtainPLValue_115.mat',
-'obtainPLValue_117.mat',
-'obtainPLValue_119.mat',
-'obtainPLValue_121.mat',
-'obtainPLValue_123.mat',
-'obtainPLValue_127.mat',
-'obtainPLValue_129.mat',
-'obtainPLValue_131.mat',
-'obtainPLValue_133.mat',
-'obtainPLValue_135.mat',
-'obtainPLValue_137.mat',
-'obtainPLValue_139.mat',
-'obtainPLValue_141.mat',
-'obtainPLValue_143.mat',
-'obtainPLValue_145.mat',
-'obtainPLValue_147.mat',
-'obtainPLValue_149.mat',
-'obtainPLValue_151.mat',
-'obtainPLValue_153.mat',
-'obtainPLValue_155.mat',
-'obtainPLValue_157.mat',
-'obtainPLValue_159.mat',
-'obtainPLValue_163.mat',
-'obtainPLValue_165.mat',
-'obtainPLValue_167.mat',
-'obtainPLValue_169.mat',
-'obtainPLValue_171.mat',
-'obtainPLValue_175.mat',
-'obtainPLValue_177.mat',
-'obtainPLValue_179.mat',
-'obtainPLValue_181.mat',
-'obtainPLValue_183.mat',
-'obtainPLValue_185.mat',
-'obtainPLValue_187.mat',
-'obtainPLValue_189.mat',
-'obtainPLValue_191.mat',
-'obtainPLValue_193.mat',
-'obtainPLValue_195.mat',
-'obtainPLValue_199.mat',
-'obtainPLValue_201.mat',
-'obtainPLValue_203.mat',
-'obtainPLValue_23.mat',
-'obtainPLValue_25.mat',
-'obtainPLValue_27.mat',
-'obtainPLValue_29.mat',
-'obtainPLValue_35.mat',
-'obtainPLValue_37.mat',
-'obtainPLValue_41.mat',
-'obtainPLValue_43.mat',
-'obtainPLValue_47.mat',
-'obtainPLValue_49.mat',
-'obtainPLValue_51.mat',
-'obtainPLValue_53.mat',
-'obtainPLValue_55.mat',
-'obtainPLValue_57.mat',
-'obtainPLValue_59.mat',
-'obtainPLValue_61.mat',
-'obtainPLValue_63.mat',
-'obtainPLValue_65.mat',
-'obtainPLValue_67.mat',
-'obtainPLValue_69.mat',
-'obtainPLValue_71.mat',
-'obtainPLValue_73.mat',
-'obtainPLValue_75.mat',
-'obtainPLValue_77.mat',
-'obtainPLValue_79.mat',
-'obtainPLValue_81.mat',
-'obtainPLValue_83.mat',
-'obtainPLValue_85.mat',
-'obtainPLValue_87.mat',
-'obtainPLValue_95.mat','obtainPLValue_197.mat', # 1,4,5,6,7,9
-        'obtainPLValue_125.mat', #1,4,5,7,9
-        'obtainPLValue_97.mat',# 1,4,5,7,9
-        'obtainPLValue_111.mat', #6,5,7,9
-        'obtainPLValue_39.mat', #7,9,6,5
-        'obtainPLValue_99.mat',#5,6,7,9
-        'obtainPLValue_33.mat',#9,7,6,5,4
-        'obtainPLValue_31.mat', #6
-]
-    file_names7 = [
-        'obtainPLValue_101.mat',
+    file_names6 = [
         'obtainPLValue_103.mat',
-        'obtainPLValue_105.mat',
-        'obtainPLValue_107.mat',
-        'obtainPLValue_109.mat',
-        'obtainPLValue_113.mat',
-        'obtainPLValue_115.mat',
         'obtainPLValue_117.mat',
         'obtainPLValue_119.mat',
-        'obtainPLValue_121.mat',
         'obtainPLValue_123.mat',
-        'obtainPLValue_127.mat',
-        'obtainPLValue_129.mat',
-        'obtainPLValue_131.mat',
-        'obtainPLValue_133.mat',
-        'obtainPLValue_135.mat',
-        'obtainPLValue_137.mat',
-        'obtainPLValue_139.mat',
-        'obtainPLValue_141.mat',
-        'obtainPLValue_143.mat',
-        'obtainPLValue_145.mat',
-        'obtainPLValue_147.mat',
-        'obtainPLValue_149.mat',
-        'obtainPLValue_151.mat',
-        'obtainPLValue_153.mat',
-        'obtainPLValue_155.mat',
-        'obtainPLValue_157.mat',
-        'obtainPLValue_159.mat',
-        'obtainPLValue_161.mat',
-        'obtainPLValue_163.mat',
-        'obtainPLValue_165.mat',
-        'obtainPLValue_167.mat',
-        'obtainPLValue_169.mat',
+        'obtainPLValue_125.mat',
         'obtainPLValue_171.mat',
-        'obtainPLValue_175.mat',
-        'obtainPLValue_177.mat',
-        'obtainPLValue_179.mat',
         'obtainPLValue_181.mat',
         'obtainPLValue_183.mat',
         'obtainPLValue_185.mat',
         'obtainPLValue_187.mat',
-        'obtainPLValue_189.mat',
         'obtainPLValue_191.mat',
         'obtainPLValue_193.mat',
         'obtainPLValue_195.mat',
-        'obtainPLValue_199.mat',
-        'obtainPLValue_201.mat',
-        'obtainPLValue_203.mat',
+        'obtainPLValue_197.mat',
+        # above is stranger
         'obtainPLValue_23.mat',
         'obtainPLValue_25.mat',
         'obtainPLValue_27.mat',
+        # 'obtainPLValue_29.mat',
         'obtainPLValue_35.mat',
         'obtainPLValue_37.mat',
         'obtainPLValue_41.mat',
@@ -981,85 +774,69 @@ if __name__ == '__main__':
         'obtainPLValue_47.mat',
         'obtainPLValue_49.mat',
         'obtainPLValue_51.mat',
-        'obtainPLValue_53.mat',
-        'obtainPLValue_55.mat',
+        # 'obtainPLValue_53.mat',
+        # 'obtainPLValue_55.mat',
         'obtainPLValue_57.mat',
         'obtainPLValue_59.mat',
         'obtainPLValue_61.mat',
-        'obtainPLValue_63.mat',
-        'obtainPLValue_65.mat',
-        'obtainPLValue_67.mat',
-        'obtainPLValue_69.mat',
-        'obtainPLValue_71.mat',
-        'obtainPLValue_73.mat',
-        'obtainPLValue_75.mat',
-        'obtainPLValue_77.mat',
-        'obtainPLValue_79.mat',
-        'obtainPLValue_81.mat',
-        'obtainPLValue_83.mat',
-        'obtainPLValue_85.mat',
-        'obtainPLValue_87.mat',
-        'obtainPLValue_95.mat','obtainPLValue_197.mat',  # 1,4,5,6,7,9
-        'obtainPLValue_125.mat',  # 1,4,5,7,9
-        'obtainPLValue_97.mat',  # 1,4,5,7,9
-        'obtainPLValue_111.mat',  # 6,5,7,9
-        'obtainPLValue_39.mat',  # 7,9,6,5
-        'obtainPLValue_99.mat',  # 5,6,7,9
-        'obtainPLValue_33.mat'  # 9,7,6,5,4
+        'obtainPLValue_63.mat'
+        # above is friends/couples
+    ]
+    file_names7 = [
+        'obtainPLValue_103.mat',
+        'obtainPLValue_117.mat',
+        'obtainPLValue_119.mat',
+        'obtainPLValue_123.mat',
+        'obtainPLValue_125.mat',
+        'obtainPLValue_171.mat',
+        'obtainPLValue_181.mat',
+        'obtainPLValue_183.mat',
+        'obtainPLValue_185.mat',
+        'obtainPLValue_187.mat',
+        'obtainPLValue_191.mat',
+        'obtainPLValue_193.mat',
+        'obtainPLValue_195.mat',
+        'obtainPLValue_197.mat',
+        # above is stranger
+        'obtainPLValue_23.mat',
+        'obtainPLValue_25.mat',
+        'obtainPLValue_27.mat',
+        # 'obtainPLValue_29.mat',
+        'obtainPLValue_35.mat',
+        'obtainPLValue_37.mat',
+        'obtainPLValue_41.mat',
+        'obtainPLValue_43.mat',
+        'obtainPLValue_47.mat',
+        'obtainPLValue_49.mat',
+        'obtainPLValue_51.mat',
+        # 'obtainPLValue_53.mat',
+        # 'obtainPLValue_55.mat',
+        'obtainPLValue_57.mat',
+        'obtainPLValue_59.mat',
+        'obtainPLValue_61.mat',
+        'obtainPLValue_63.mat'
+        # above is friends/couples
     ]
     file_names9 = [
-        'obtainPLValue_101.mat',
         'obtainPLValue_103.mat',
-        'obtainPLValue_105.mat',
-        'obtainPLValue_107.mat',
-        'obtainPLValue_109.mat',
-        'obtainPLValue_113.mat',
-        'obtainPLValue_115.mat',
         'obtainPLValue_117.mat',
         'obtainPLValue_119.mat',
-        'obtainPLValue_121.mat',
         'obtainPLValue_123.mat',
-        'obtainPLValue_127.mat',
-        'obtainPLValue_129.mat',
-        'obtainPLValue_131.mat',
-        'obtainPLValue_133.mat',
-        'obtainPLValue_135.mat',
-        'obtainPLValue_137.mat',
-        'obtainPLValue_139.mat',
-        'obtainPLValue_141.mat',
-        'obtainPLValue_143.mat',
-        'obtainPLValue_145.mat',
-        'obtainPLValue_147.mat',
-        'obtainPLValue_149.mat',
-        'obtainPLValue_151.mat',
-        'obtainPLValue_153.mat',
-        'obtainPLValue_155.mat',
-        'obtainPLValue_157.mat',
-        'obtainPLValue_159.mat',
-        'obtainPLValue_161.mat',
-        'obtainPLValue_163.mat',
-        'obtainPLValue_165.mat',
-        'obtainPLValue_167.mat',
-        'obtainPLValue_169.mat',
+        'obtainPLValue_125.mat',
         'obtainPLValue_171.mat',
-        'obtainPLValue_175.mat',
-        'obtainPLValue_177.mat',
-        'obtainPLValue_179.mat',
         'obtainPLValue_181.mat',
         'obtainPLValue_183.mat',
         'obtainPLValue_185.mat',
         'obtainPLValue_187.mat',
-        'obtainPLValue_189.mat',
         'obtainPLValue_191.mat',
         'obtainPLValue_193.mat',
         'obtainPLValue_195.mat',
-        'obtainPLValue_199.mat',
-        'obtainPLValue_201.mat',
-        'obtainPLValue_203.mat',
+        'obtainPLValue_197.mat',
+        # above is stranger
         'obtainPLValue_23.mat',
         'obtainPLValue_25.mat',
         'obtainPLValue_27.mat',
-        'obtainPLValue_29.mat',
+        # 'obtainPLValue_29.mat',
         'obtainPLValue_35.mat',
         'obtainPLValue_37.mat',
         'obtainPLValue_41.mat',
@@ -1067,39 +844,31 @@ if __name__ == '__main__':
         'obtainPLValue_47.mat',
         'obtainPLValue_49.mat',
         'obtainPLValue_51.mat',
-        'obtainPLValue_55.mat',
+        # 'obtainPLValue_53.mat',
+        # 'obtainPLValue_55.mat',
         'obtainPLValue_57.mat',
         'obtainPLValue_59.mat',
         'obtainPLValue_61.mat',
-        'obtainPLValue_63.mat',
-        'obtainPLValue_65.mat',
-        'obtainPLValue_67.mat',
-        'obtainPLValue_69.mat',
-        'obtainPLValue_71.mat',
-        'obtainPLValue_73.mat',
-        'obtainPLValue_75.mat',
-        'obtainPLValue_77.mat',
-        'obtainPLValue_79.mat',
-        'obtainPLValue_81.mat',
-        'obtainPLValue_83.mat',
-        'obtainPLValue_85.mat',
-        'obtainPLValue_87.mat',
-        'obtainPLValue_95.mat','obtainPLValue_197.mat',  # 1,4,5,6,7,9
-        'obtainPLValue_125.mat',  # 1,4,5,7,9
-        'obtainPLValue_97.mat',  # 1,4,5,7,9
-        'obtainPLValue_111.mat',  # 6,5,7,9
-        'obtainPLValue_39.mat',  # 7,9,6,5
-        'obtainPLValue_99.mat',  # 5,6,7,9
-        'obtainPLValue_33.mat'
+        'obtainPLValue_63.mat'
+        # above is friends/couples
     ]
     data1, labels1, subjects1, file_names_list1 = load_eeg_data_mat(data_dir1, file_names, friend_ids)
+    print(f"Data1 samples: {len(data1)}")
     data4, labels4, subjects4, file_names_list4 = load_eeg_data_mat(data_dir4, file_names4, friend_ids)
+    print(f"Data4 samples: {len(data4)}")
     data5, labels5, subjects5, file_names_list5 = load_eeg_data_mat(data_dir5, file_names5, friend_ids)
+    print(f"Data5 samples: {len(data5)}")
     data6, labels6, subjects6, file_names_list6 = load_eeg_data_mat(data_dir6, file_names6, friend_ids)
+    print(f"Data6 samples: {len(data6)}")
     data7, labels7, subjects7, file_names_list7 = load_eeg_data_mat(data_dir7, file_names7, friend_ids)
+    print(f"Data7 samples: {len(data7)}")
     data9, labels9, subjects9, file_names_list9 = load_eeg_data_mat(data_dir9, file_names9, friend_ids)
+    print(f"Data9 samples: {len(data9)}")
     data = data1 + data4 + data5 + data6 + data7 + data9
+    print(f"Total samples loaded: {len(data)}")
     labels = np.concatenate([labels1, labels4, labels5, labels6, labels7, labels9])
+    label_counts = Counter(labels)
+    print(f"Label distribution: {label_counts}")
     subjects = subjects1 + subjects4 + subjects5 + subjects6 + subjects7 + subjects9
     file_names_list = file_names_list1 + file_names_list4 + file_names_list5 + file_names_list6 + file_names_list7 + file_names_list9
     data = [d.astype(np.float32) if not isinstance(d, np.ndarray) else d for d in data]
@@ -1135,15 +904,30 @@ if __name__ == '__main__':
         num_classes=2,
     ).to(device)
     # Define loss functions
-    criterion_classification = nn.CrossEntropyLoss()
+    """
+    class_counts = np.bincount(labels)
+    class_weights = [sum(class_counts) / c for c in class_counts]
+    class_weights = torch.FloatTensor(class_weights).to(device)
+    criterion_classification = nn.CrossEntropyLoss(weight=class_weights)
+    
+    """
+    #criterion_classification = nn.CrossEntropyLoss()
+    label_counts = Counter(labels)
+    total_samples = sum(label_counts.values())
+    class_weights = {label: total_samples / count for label, count in label_counts.items()}
+    weights = [class_weights[0], class_weights[1]]  # Assuming labels are 0 and 1
+    weights = torch.FloatTensor(weights).to(device)
+    criterion_classification = nn.CrossEntropyLoss(weight=weights)
+
+
     criterion_triplet = TripletLoss(margin=1.0)
     criterion_cca = CCALoss()
     # Define learning rate
-    learning_rate = 1e-4
+    learning_rate = 0.0001
     # Initialize separate optimizers
     optimizer_f = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate)
     optimizer_c = torch.optim.Adam(model.classifier.parameters(), lr=learning_rate)
-    num_epochs = 100
+    num_epochs = 200
     # Training loop
     for epoch in range(num_epochs):
         avg_loss_combined, avg_loss_triplet, f1 = train_model(
