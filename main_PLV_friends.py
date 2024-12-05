@@ -30,7 +30,8 @@ class TripletLoss(nn.Module):
         super(TripletLoss, self).__init__()
         self.margin = margin  # positive float, define minimum difference between pos and neg distance
         self.dist_func = dist_func  # default is cosine
-# Given anchor (reference sample), positive (sample similar to anchor), negative sample (sample disimilar to anchor)
+
+    # Given anchor (reference sample), positive (sample similar to anchor), negative sample (sample disimilar to anchor)
 
     def forward(self, anchor, positive, negative):
         if self.dist_func == 'euclidean':
@@ -90,7 +91,6 @@ class CCALoss(nn.Module):
         return loss
 
 
-
 # Slide 6,7
 # DSEN Model Implementation
 class DSEN(nn.Module):
@@ -132,9 +132,12 @@ class DSEN(nn.Module):
         )
 
         # EdgeConv layers and linear layers remain the same
-        self.conv1 = EdgeConv(Sequential(Linear(2 * 128, 128), ReLU(), Linear(128, 128), ReLU(), BatchNorm1d(128), Dropout(p=0.25)))
-        self.conv2 = EdgeConv(Sequential(Linear(2 * 128, 256), ReLU(), Linear(256, 256), ReLU(), BatchNorm1d(256), Dropout(p=0.25)))
-        self.conv3 = EdgeConv(Sequential(Linear(2 * 256, 512), ReLU(), Linear(512, 512), ReLU(), BatchNorm1d(512), Dropout(p=0.25)))
+        self.conv1 = EdgeConv(
+            Sequential(Linear(2 * 128, 128), ReLU(), Linear(128, 128), ReLU(), BatchNorm1d(128), Dropout(p=0.25)))
+        self.conv2 = EdgeConv(
+            Sequential(Linear(2 * 128, 256), ReLU(), Linear(256, 256), ReLU(), BatchNorm1d(256), Dropout(p=0.25)))
+        self.conv3 = EdgeConv(
+            Sequential(Linear(2 * 256, 512), ReLU(), Linear(512, 512), ReLU(), BatchNorm1d(512), Dropout(p=0.25)))
 
         self.linear1 = Linear(128 + 256 + 512, 256)
         self.linear2 = Linear(256, 128)
@@ -185,13 +188,13 @@ class DSEN(nn.Module):
         # Apply Fully connected layers
         out = F.relu(self.linear1(out))  # reduce dim to 256, apply RELu activation function
         out = F.dropout(out, p=0.25)  # prevent overfitting
-        out = F.relu(self.linear2(out)) # reduce dim to 128
+        out = F.relu(self.linear2(out))  # reduce dim to 128
         # φ (x1 pooled + x2 pooled + x3 pooled)
         # φ is linear transformation
         return out  # Shape: (batch_size, 128) embedding for each sample
 
 
-#Slide 8
+# Slide 8
 # Relation Classifier with Attention Mechanism
 class RelationClassifier(nn.Module):
     def __init__(self, num_features=128, num_classes=2):
@@ -205,7 +208,7 @@ class RelationClassifier(nn.Module):
         self.W_q = nn.Linear(self.hidden_size, self.hidden_size)  # linear transformation for query vectors.
         self.W_k = nn.Linear(self.hidden_size, self.hidden_size)  # linear transformation for key vectors.
         self.W_v = nn.Linear(self.hidden_size, self.hidden_size)  # linear transformation for value vectors.
-        #total_input_size = self.hidden_size * 2 + self.num_plv_features + self.num_isc_features
+        # total_input_size = self.hidden_size * 2 + self.num_plv_features + self.num_isc_features
         # self.fc1 = Linear(self.hidden_size * 2, self.hidden_size)  # reduce concatenation back to 128 dim
         self.fc1 = nn.Linear(self.hidden_size * 2, self.hidden_size)
         self.fc2 = Linear(self.hidden_size, num_classes)  # maps to logits (friends or strangers)
@@ -213,7 +216,7 @@ class RelationClassifier(nn.Module):
     def forward(self, x1, x2):  # equation (5) from the thesis
         # apply attention mechanism, classify relationship
         # x1 is first EEG sample, x2 is second EEG sample
-        Q_x1 = self.W_q(x1).unsqueeze(1) # Shape: (batch_size, 1, hidden_size = 128)
+        Q_x1 = self.W_q(x1).unsqueeze(1)  # Shape: (batch_size, 1, hidden_size = 128)
         K_x2 = self.W_k(x2).unsqueeze(1)
         V_x2 = self.W_v(x2).unsqueeze(1)
 
@@ -231,7 +234,7 @@ class RelationClassifier(nn.Module):
         fused_1 = torch.matmul(attention_w_1, V_x2).squeeze(1)  # Shape: (batch_size, hidden_size)
         fused_2 = torch.matmul(attention_w_2, V_x1).squeeze(1)
         # Concatenate the fused features into single feature vector for classification
-        #x_fused = torch.cat((fused_1, fused_2), dim=1)  # Shape: (batch_size, hidden_size * 2 = 256)
+        # x_fused = torch.cat((fused_1, fused_2), dim=1)  # Shape: (batch_size, hidden_size * 2 = 256)
         x_fused = torch.cat((fused_1, fused_2), dim=1)
         # Classification Layers (fully connected)
         x = F.relu(self.fc1(x_fused))  # reduce dim to 128,apply ReLu activation function
@@ -287,15 +290,15 @@ class ISCCalculator:
 
 # Putting it all together
 class DSENModel(nn.Module):
-    def __init__(self, num_channels=30, time_len=3600, num_features=128,num_classes=2):
+    def __init__(self, num_channels=30, time_len=3600, num_features=128, num_classes=2):
         super(DSENModel, self).__init__()
         self.encoder = DSEN(num_channels=num_channels)
-        #self.num_frequency_bands = num_frequency_bands
+        # self.num_frequency_bands = num_frequency_bands
         self.classifier = RelationClassifier(
             num_features=num_features,
             num_classes=num_classes,
-            #num_plv_features=0,
-            #num_isc_features=num_isc_features
+            # num_plv_features=0,
+            # num_isc_features=num_isc_features
         )
 
     def forward(self, x1, x2):
@@ -324,6 +327,7 @@ def extract_subject_id(file_name):
     else:
         print("No match found.")
         return None
+
 
 # slide 14
 # Load your data from .mat files
@@ -416,6 +420,8 @@ def load_eeg_data_mat(data_dir, file_names, friend_ids):
             print(f"Not all frequency bands found for {file_name}. Skipping.")
 
     return data, labels, subjects, file_names_list
+
+
 """
 def create_pairs_and_triplets(data, labels, num_pairs=1000, num_triplets=1000):
     pairs = []
@@ -466,6 +472,8 @@ def create_pairs_and_triplets(data, labels, num_pairs=1000, num_triplets=1000):
 
     return pairs, pair_labels, triplets
 """
+
+
 def create_pairs_and_triplets(data, labels):
     pairs = []
     pair_labels = []
@@ -568,7 +576,8 @@ class EEGDataset(Dataset):
 
 
 # slide 13
-def train_model(model, train_loader, optimizer_f, optimizer_c, criterion_classification, criterion_triplet, criterion_cca, device):
+def train_model(model, train_loader, optimizer_f, optimizer_c, criterion_classification, criterion_triplet,
+                criterion_cca, device):
     model.train()
     total_loss_combined = 0
     total_loss_triplet = 0
@@ -624,7 +633,6 @@ def train_model(model, train_loader, optimizer_f, optimizer_c, criterion_classif
     return avg_loss_combined, avg_loss_triplet, f1
 
 
-
 if __name__ == '__main__':
     # Device configuration
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -636,11 +644,11 @@ if __name__ == '__main__':
     data_dir7 = '/home/derrick/PycharmProjects/datayx/hyperemotion7/subB'
     data_dir9 = '/home/derrick/PycharmProjects/datayx/hyperemotion9/subB'
 
-    friend_ids = [23,25,27,35,37,43,47,49,51,57,59,67,69,73,77,79,81,83,85,105,107,
-     131,137,143,153,159]
+    friend_ids = [23, 25, 27, 35, 37, 43, 47, 49, 51, 57, 59, 67, 69, 73, 77, 79, 81, 83, 85, 105, 107,
+                  131, 137, 143, 153, 159]
     # couple_ids = [41,61,63,65,71,87,109,115,121,127,129,133,135,139,141,147,149,151,155,157,163,165,167,175,177,
     #                   189,199,201,203]
-    strangers_ids = [95,97,101,103,117,119,123,125,171,181,183,185,187,191,193,195,197]
+    strangers_ids = [95, 97, 101, 103, 117, 119, 123, 125, 171, 181, 183, 185, 187, 191, 193, 195, 197]
 
     file_names = [
         'obtainPLValue_103.mat',
@@ -671,7 +679,7 @@ if __name__ == '__main__':
         'obtainPLValue_59.mat',
         'obtainPLValue_67.mat',
         'obtainPLValue_69.mat',
-        'obtainPLValue_73.mat',
+        'obtainPLValue_73.mat'
         # above is friends only
     ]
     file_names4 = [
@@ -703,7 +711,7 @@ if __name__ == '__main__':
         'obtainPLValue_59.mat',
         'obtainPLValue_67.mat',
         'obtainPLValue_69.mat',
-        'obtainPLValue_73.mat',
+        'obtainPLValue_73.mat'
         # above is friends only
     ]
     file_names5 = [
@@ -735,7 +743,7 @@ if __name__ == '__main__':
         'obtainPLValue_59.mat',
         'obtainPLValue_67.mat',
         'obtainPLValue_69.mat',
-        'obtainPLValue_73.mat',
+        'obtainPLValue_73.mat'
         # above is friends only
     ]
     file_names6 = [
@@ -767,7 +775,7 @@ if __name__ == '__main__':
         'obtainPLValue_59.mat',
         'obtainPLValue_67.mat',
         'obtainPLValue_69.mat',
-        'obtainPLValue_73.mat',
+        'obtainPLValue_73.mat'
         # above is friends only
     ]
     file_names7 = [
@@ -799,7 +807,7 @@ if __name__ == '__main__':
         'obtainPLValue_59.mat',
         'obtainPLValue_67.mat',
         'obtainPLValue_69.mat',
-        'obtainPLValue_73.mat',
+        'obtainPLValue_73.mat'
         # above is friends only
     ]
     file_names9 = [
@@ -831,7 +839,7 @@ if __name__ == '__main__':
         'obtainPLValue_59.mat',
         'obtainPLValue_67.mat',
         'obtainPLValue_69.mat',
-        'obtainPLValue_73.mat',
+        'obtainPLValue_73.mat'
         # above is friends only
     ]
     data1, labels1, subjects1, file_names_list1 = load_eeg_data_mat(data_dir1, file_names, friend_ids)
@@ -874,7 +882,7 @@ if __name__ == '__main__':
     num_frequency_bands = 4
     num_channels = data[0].shape[1]
     num_features = 128
-    #num_samples, num_features = data[0].shape
+    # num_samples, num_features = data[0].shape
     num_plv_features = 0
     num_isc_features = num_channels
     time_len = num_channels  # Since PLV matrices are square (channels x channels)
@@ -891,16 +899,15 @@ if __name__ == '__main__':
     class_weights = [sum(class_counts) / c for c in class_counts]
     class_weights = torch.FloatTensor(class_weights).to(device)
     criterion_classification = nn.CrossEntropyLoss(weight=class_weights)
-    
+
     """
-    #criterion_classification = nn.CrossEntropyLoss()
+    # criterion_classification = nn.CrossEntropyLoss()
     label_counts = Counter(labels)
     total_samples = sum(label_counts.values())
     class_weights = {label: total_samples / count for label, count in label_counts.items()}
     weights = [class_weights[0], class_weights[1]]  # Assuming labels are 0 and 1
     weights = torch.FloatTensor(weights).to(device)
     criterion_classification = nn.CrossEntropyLoss(weight=weights)
-
 
     criterion_triplet = TripletLoss(margin=1.0)
     criterion_cca = CCALoss()
@@ -922,7 +929,7 @@ if __name__ == '__main__':
             criterion_cca,
             device
         )
-        print(f'Epoch [{epoch+1}/{num_epochs}], Combined Loss: {avg_loss_combined:.4f}, '
+        print(f'Epoch [{epoch + 1}/{num_epochs}], Combined Loss: {avg_loss_combined:.4f}, '
               f'Triplet Loss: {avg_loss_triplet:.4f}, F1 Score: {f1:.4f}')
     print('Training complete.')
 
